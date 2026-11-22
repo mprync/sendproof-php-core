@@ -1,0 +1,971 @@
+/* =====================================================================
+   Sendproof — v3 mock design system
+
+   Evolves v2 (Geist, OKLCH neutrals tinted to hue 268, rem sizing). What changed:
+
+   1. A larger scale than v2, tuned with the owner: 14 px body text, 36 px controls and
+      40 px tabs. Every size is in rem, so browser zoom and the OS text size scale the UI.
+   2. Density is a token set: [data-density="compact" | "comfortable"] swaps sizes,
+      never layout. Default is the middle step.
+   3. Logical properties only (inline/block, start/end), so [dir="rtl"] mirrors the
+      layout without a second stylesheet.
+   4. One tab component (.tab) everywhere. Counts sit in a small badge; issue markers
+      are a dot that overlays the label and never changes the tab's width.
+   5. No layout shift: assist lines, status slots, button widths and count badges are
+      all reserved. Copy feedback overlays rather than reflows.
+   6. v4: one stable shell. Sidebar, main and right column keep their widths in Try it, Docs
+      and Models; every column starts with a head row one tab tall and ends with a bar of
+      --bar-h, so the panes share one top line and one bottom line.
+   ===================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap");
+
+:root {
+  color-scheme: light;
+
+  --bg:          oklch(0.985 0.002 268);
+  --panel:       oklch(0.993 0.0015 268);
+  --raised:      oklch(1 0.0005 268);
+  --sunken:      oklch(0.967 0.004 268);
+  --hover:       oklch(0.955 0.005 268);
+  --selected:    oklch(0.94 0.012 268);
+
+  --line:        oklch(0.915 0.005 268);
+  --line-strong: oklch(0.85 0.007 268);
+
+  --text:        oklch(0.22 0.012 268);
+  --text-2:      oklch(0.42 0.012 268);
+  --text-3:      oklch(0.51 0.012 268);
+
+  --accent:      oklch(0.50 0.19 268);
+  --accent-hover:oklch(0.45 0.19 268);
+  --accent-soft: oklch(0.95 0.025 268);
+  --accent-text: oklch(0.45 0.19 268);
+  --on-accent:   oklch(0.99 0.003 268);
+  --focus:       oklch(0.55 0.2 268);
+  /* The brand mark (docs/images/logo): monochrome, black in light, white in dark; the faint dart's opacity. */
+  --mark:        oklch(0.15 0 0);
+  --mark-ghost:  0.35;
+
+  --ok:          oklch(0.48 0.13 155);  --ok-soft:     oklch(0.96 0.03 155);
+  --warn:        oklch(0.50 0.12 70);   --warn-soft:   oklch(0.965 0.04 85);
+  --danger:      oklch(0.52 0.19 25);   --danger-soft: oklch(0.965 0.02 25);
+  --danger-line: oklch(0.62 0.17 25);
+
+  --get:    oklch(0.46 0.13 155);  --get-bg:    oklch(0.955 0.03 155);
+  --post:   oklch(0.46 0.15 245);  --post-bg:   oklch(0.955 0.025 245);
+  --put:    oklch(0.48 0.12 65);   --put-bg:    oklch(0.96 0.04 80);
+  --patch:  oklch(0.46 0.17 300);  --patch-bg:  oklch(0.96 0.025 300);
+  --delete: oklch(0.50 0.19 25);   --delete-bg: oklch(0.96 0.02 25);
+
+  /* v5 colour: one accent (268) plus semantic hues, used only where colour carries meaning or
+     helps scanning. Every text token meets 4.5:1 on --bg, --panel, --raised and its own soft
+     background in both themes (ui/token-contrast.test.mjs checks it). */
+  --info:        oklch(0.50 0.11 235);  --info-soft:   oklch(0.962 0.022 235);
+  --required:    oklch(0.53 0.125 58);  /* "Required": a small warm tone, not a warning */
+  --code-bg:     oklch(0.955 0.012 268); /* inline code, enum values */
+  --fact:        oklch(0.45 0.07 268);  /* constraint values: tinted mono */
+  /* Types by family, quiet but distinguishable, echoing the JSON syntax colours. */
+  --t-string:    oklch(0.48 0.09 155);
+  --t-number:    oklch(0.50 0.11 50);
+  --t-boolean:   oklch(0.48 0.12 300);
+  --t-object:    oklch(0.48 0.09 235);
+  --t-enum:      oklch(0.47 0.08 190);
+  /* Parameter locations: a soft pill each. */
+  --in-path:   oklch(0.47 0.12 245);  --in-path-bg:   oklch(0.955 0.024 245);
+  --in-query:  oklch(0.46 0.09 175);  --in-query-bg:  oklch(0.955 0.026 175);
+  --in-header: oklch(0.47 0.12 300);  --in-header-bg: oklch(0.96 0.022 300);
+  --in-cookie: oklch(0.50 0.11 60);   --in-cookie-bg: oklch(0.962 0.035 75);
+
+  --font: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Type scale (Default density). 14 px body, 12.5 px assist, 11.5 px badges. */
+  --fs-xs:   0.71875rem;
+  --fs-sm:   0.78125rem;
+  --fs-md:   0.8125rem;
+  --fs-base: 0.875rem;
+  --fs-lg:   1rem;
+  --fs-xl:   1.25rem;
+  --lh:      1.5;
+
+  /* Size tokens. Density swaps these and nothing else. */
+  --control-h: 2.25rem;   /* 36 px inputs and buttons */
+  --btn-sm-h:  1.875rem;  /* 30 px secondary buttons */
+  --btn-xs-h:  1.625rem;  /* 26 px inline row actions */
+  --tab-h:     2.5rem;    /* 40 px tabs */
+  --row-h:     2.125rem;  /* 34 px nav rows and list rows */
+  --topbar-h:  3.25rem;
+  --bar-h:     3.75rem;   /* action bar */
+  --assist-h:  1.1875rem;
+  --kbd-h:     1.3125rem;
+  --icon:      1.0625rem;
+  --icon-sm:   0.9375rem;
+  --pad:       1.5rem;    /* pane gutter */
+  --gap:       1.125rem;  /* between fields */
+
+  --r-sm: 0.3125rem;
+  --r:    0.4375rem;
+  --r-lg: 0.625rem;
+  --shadow-sm: 0 1px 0 oklch(0.2 0.02 268 / 0.03), 0 1px 2px oklch(0.2 0.02 268 / 0.05);
+  --shadow-pop: 0 0 0 1px oklch(0.2 0.02 268 / 0.08), 0 8px 24px -6px oklch(0.2 0.02 268 / 0.16), 0 24px 56px -16px oklch(0.2 0.02 268 / 0.18);
+  --ring: 0 0 0 3px color-mix(in oklch, var(--focus) 22%, transparent);
+  --ring-danger: 0 0 0 3px color-mix(in oklch, var(--danger) 16%, transparent);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Compact: 13 px text, 32 px controls, 36 px tabs. */
+[data-density="compact"] {
+  --fs-xs: 0.6875rem; --fs-sm: 0.75rem; --fs-md: 0.78125rem; --fs-base: 0.8125rem; --fs-lg: 0.9375rem; --fs-xl: 1.125rem;
+  --control-h: 2rem; --btn-sm-h: 1.625rem; --btn-xs-h: 1.5rem; --tab-h: 2.25rem; --row-h: 1.875rem;
+  --topbar-h: 2.875rem; --bar-h: 3.25rem; --assist-h: 1.0625rem; --kbd-h: 1.1875rem; --icon: 0.9375rem; --icon-sm: 0.8125rem;
+  --pad: 1.125rem; --gap: 0.875rem;
+}
+/* Comfortable: 15 px text, 40 px controls, 44 px tabs. */
+[data-density="comfortable"] {
+  --fs-xs: 0.75rem; --fs-sm: 0.8125rem; --fs-md: 0.875rem; --fs-base: 0.9375rem; --fs-lg: 1.0625rem; --fs-xl: 1.375rem;
+  --control-h: 2.5rem; --btn-sm-h: 2rem; --btn-xs-h: 1.75rem; --tab-h: 2.75rem; --row-h: 2.25rem;
+  --topbar-h: 3.5rem; --bar-h: 4rem; --assist-h: 1.25rem; --kbd-h: 1.375rem; --icon: 1.125rem; --icon-sm: 1rem;
+  --pad: 1.75rem; --gap: 1.25rem;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:          oklch(0.175 0.006 268);
+  --panel:       oklch(0.192 0.006 268);
+  --raised:      oklch(0.215 0.007 268);
+  --sunken:      oklch(0.16 0.006 268);
+  --hover:       oklch(0.24 0.008 268);
+  --selected:    oklch(0.265 0.018 268);
+  --line:        oklch(0.27 0.007 268);
+  --line-strong: oklch(0.34 0.008 268);
+  --text:        oklch(0.95 0.004 268);
+  --text-2:      oklch(0.80 0.008 268);
+  --text-3:      oklch(0.70 0.01 268);
+  --accent:      oklch(0.56 0.18 268);
+  --accent-hover:oklch(0.6 0.18 268);
+  --accent-soft: oklch(0.28 0.05 268);
+  --accent-text: oklch(0.80 0.11 268);
+  --focus:       oklch(0.72 0.15 268);
+  /* White on the dark top bar, with the preview dart at the same contrast as in light. */
+  --mark:        oklch(0.98 0 0);
+  --mark-ghost:  0.4;
+  --ok:          oklch(0.78 0.13 155);  --ok-soft:     oklch(0.26 0.04 155);
+  --warn:        oklch(0.82 0.12 80);   --warn-soft:   oklch(0.27 0.04 80);
+  --danger:      oklch(0.76 0.14 25);   --danger-soft: oklch(0.25 0.045 25);
+  --danger-line: oklch(0.66 0.15 25);
+  --get:    oklch(0.80 0.13 155);  --get-bg:    oklch(0.27 0.045 155);
+  --post:   oklch(0.80 0.11 245);  --post-bg:   oklch(0.27 0.05 245);
+  --put:    oklch(0.84 0.11 80);   --put-bg:    oklch(0.28 0.045 80);
+  --patch:  oklch(0.80 0.12 300);  --patch-bg:  oklch(0.27 0.05 300);
+  --delete: oklch(0.78 0.14 25);   --delete-bg: oklch(0.27 0.05 25);
+  --info:        oklch(0.80 0.10 235);  --info-soft:   oklch(0.27 0.04 235);
+  --required:    oklch(0.81 0.11 65);
+  --code-bg:     oklch(0.255 0.014 268);
+  --fact:        oklch(0.82 0.06 268);
+  --t-string:    oklch(0.80 0.10 155);
+  --t-number:    oklch(0.82 0.10 55);
+  --t-boolean:   oklch(0.80 0.10 300);
+  --t-object:    oklch(0.80 0.09 235);
+  --t-enum:      oklch(0.80 0.08 190);
+  --in-path:   oklch(0.82 0.09 245);  --in-path-bg:   oklch(0.28 0.045 245);
+  --in-query:  oklch(0.82 0.08 175);  --in-query-bg:  oklch(0.28 0.04 175);
+  --in-header: oklch(0.82 0.09 300);  --in-header-bg: oklch(0.28 0.045 300);
+  --in-cookie: oklch(0.84 0.10 75);   --in-cookie-bg: oklch(0.29 0.045 75);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
+  --shadow-pop: 0 0 0 1px oklch(1 0 0 / 0.08), 0 16px 48px -8px oklch(0 0 0 / 0.6);
+}
+
+/* Scripts Geist doesn't cover get a face after it (settings.js loads it only for the active
+   language); code stays in Geist Mono. CJK sets a taller line and no letter-spacing. */
+:lang(ar), :lang(fa) { --font: "IBM Plex Sans Arabic", "Geist", ui-sans-serif, system-ui, sans-serif; }
+:lang(he) { --font: "Geist", "Noto Sans Hebrew", ui-sans-serif, system-ui, sans-serif; }
+:lang(hi) { --font: "Geist", "Noto Sans Devanagari", ui-sans-serif, system-ui, sans-serif; }
+:lang(th) { --font: "Geist", "Noto Sans Thai", ui-sans-serif, system-ui, sans-serif; }
+:lang(ja) { --font: "Geist", "Noto Sans JP", "Hiragino Sans", ui-sans-serif, system-ui, sans-serif; --lh: 1.6; }
+:lang(ko) { --font: "Geist", "Noto Sans KR", "Apple SD Gothic Neo", ui-sans-serif, system-ui, sans-serif; --lh: 1.6; }
+:lang(zh-Hans) { --font: "Geist", "Noto Sans SC", "PingFang SC", ui-sans-serif, system-ui, sans-serif; --lh: 1.6; }
+:lang(zh-Hant) { --font: "Geist", "Noto Sans TC", "PingFang TC", ui-sans-serif, system-ui, sans-serif; --lh: 1.6; }
+:root:is(:lang(ja), :lang(ko), :lang(zh)) :is(h1, h2, .op-title) { letter-spacing: 0; }
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 100%; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 400 var(--fs-base)/var(--lh) var(--font);
+  -webkit-font-smoothing: antialiased; font-feature-settings: "ss01", "cv11";
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+code, .mono { font-family: var(--mono); font-size: 0.9em; }
+/* Code is always left-to-right and isolated, so paths read correctly inside Arabic sentences. */
+code { direction: ltr; unicode-bidi: isolate; }
+/* Spec text keeps its own direction inside an RTL UI. */
+[dir="rtl"] [lang="en"], [dir="rtl"] [lang="en"] :is(p, li, td, th, dd, h1, h2, h3) { unicode-bidi: plaintext; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--r-sm); }
+.sr-only { position: absolute; inline-size: 1px; block-size: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; inset-inline-start: 0.5rem; inset-block-start: -3rem; z-index: 99; background: var(--raised); padding: 0.5rem 0.75rem; border-radius: var(--r); box-shadow: var(--shadow-pop); }
+.skip-link:focus { inset-block-start: 0.5rem; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+svg.i { inline-size: var(--icon); block-size: var(--icon); flex: none; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+svg.i-sm { inline-size: var(--icon-sm); block-size: var(--icon-sm); }
+/* Direction-bearing icons mirror in RTL; clocks, checks and brand marks do not. */
+[dir="rtl"] svg.i-dir { transform: scaleX(-1); }
+.muted { color: var(--text-2); }
+.faint { color: var(--text-3); }
+.grow { flex: 1; min-inline-size: 0; }
+.spacer { flex: 1; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
+
+/* ---------- Primitives ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  min-block-size: var(--control-h); padding-inline: 0.875rem; border-radius: var(--r);
+  border: 1px solid var(--line-strong); background: var(--raised); color: var(--text);
+  font-size: var(--fs-base); font-weight: 500; white-space: nowrap; cursor: pointer;
+  box-shadow: var(--shadow-sm); transition: background 120ms var(--ease); position: relative;
+}
+.btn:hover { background: var(--hover); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+.btn-primary { background: var(--accent); border-color: transparent; color: var(--on-accent); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-ghost { background: transparent; border-color: transparent; box-shadow: none; color: var(--text-2); }
+.btn-ghost:hover { background: var(--hover); color: var(--text); }
+.btn-danger-soft { background: var(--danger-soft); border-color: color-mix(in oklch, var(--danger) 30%, transparent); color: var(--danger); box-shadow: none; }
+.btn-sm { min-block-size: var(--btn-sm-h); padding-inline: 0.625rem; font-size: var(--fs-md); gap: 0.4rem; }
+.btn-xs { min-block-size: var(--btn-xs-h); block-size: var(--btn-xs-h); padding-inline: 0.5rem; font-size: var(--fs-sm); gap: 0.35rem; }
+.btn-icon { inline-size: var(--control-h); padding: 0; }
+.btn-icon.btn-sm { inline-size: var(--btn-sm-h); }
+.btn-icon.btn-xs { inline-size: var(--btn-xs-h); }
+.link { color: var(--accent-text); text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; cursor: pointer; background: none; border: 0; padding: 0; font: inherit; }
+
+/* One keycap per shortcut. The whole chord lives in a single chip, e.g. "⇧⌘↵". */
+.kbd {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.1em; min-inline-size: var(--kbd-h); block-size: var(--kbd-h);
+  padding-inline: 0.375rem; border-radius: 0.3rem; border: 1px solid var(--line); border-block-end-width: 2px; background: var(--sunken);
+  font: 500 var(--fs-xs)/1 var(--font); color: var(--text-2); flex: none; white-space: nowrap; direction: ltr; letter-spacing: 0.12em; text-indent: 0.06em;
+}
+/* The keycap tint stays light enough for 4.5:1 text contrast on the accent (WCAG 1.4.3). */
+.btn-primary .kbd { background: oklch(1 0 0 / 0.1); border-color: oklch(1 0 0 / 0.22); color: var(--on-accent); }
+[data-theme="dark"] .btn-primary .kbd { background: oklch(0 0 0 / 0.16); border-color: oklch(0 0 0 / 0.24); }
+.keys { display: inline-flex; gap: 0.3rem; align-items: center; }
+.keys .then { font-size: var(--fs-xs); color: var(--text-3); }
+
+.method {
+  display: inline-flex; align-items: center; justify-content: center; min-inline-size: 3rem; block-size: 1.25rem;
+  padding-inline: 0.35rem; border-radius: var(--r-sm); font: 600 0.65625rem/1 var(--mono); letter-spacing: 0.02em; flex: none; direction: ltr;
+}
+.m-get { color: var(--get); background: var(--get-bg); }
+.m-post { color: var(--post); background: var(--post-bg); }
+.m-put { color: var(--put); background: var(--put-bg); }
+.m-patch { color: var(--patch); background: var(--patch-bg); }
+.m-delete { color: var(--delete); background: var(--delete-bg); }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 0.4rem; block-size: 1.5rem; padding-inline: 0.6rem;
+  border-radius: 999px; border: 1px solid var(--line); background: var(--raised);
+  font-size: var(--fs-sm); color: var(--text-2); white-space: nowrap;
+}
+.pill code { font-size: var(--fs-xs); }
+.dot { inline-size: 0.45rem; block-size: 0.45rem; border-radius: 50%; background: var(--ok); flex: none; }
+.pill-ok { color: var(--ok); background: var(--ok-soft); border-color: transparent; }
+.pill-warn { color: var(--warn); background: var(--warn-soft); border-color: transparent; }
+.pill-danger { color: var(--danger); background: var(--danger-soft); border-color: transparent; }
+.pill-accent { color: var(--accent-text); background: var(--accent-soft); border-color: transparent; }
+
+/* Small, understated badges: 19 px tall, 11.5 px text. */
+.tag {
+  display: inline-flex; align-items: center; gap: 0.3rem; block-size: 1.1875rem; padding-inline: 0.4rem; border-radius: var(--r-sm);
+  font: 500 var(--fs-xs)/1 var(--font); color: var(--text-2); background: var(--sunken); border: 1px solid var(--line); white-space: nowrap;
+}
+.tag .i { inline-size: 0.8rem; block-size: 0.8rem; }
+.tag-accent { color: var(--accent-text); background: var(--accent-soft); border-color: transparent; }
+.tag-ok { color: var(--ok); background: var(--ok-soft); border-color: transparent; }
+.tag-warn { color: var(--warn); background: var(--warn-soft); border-color: transparent; }
+.tag-danger { color: var(--danger); background: var(--danger-soft); border-color: transparent; }
+.tag-mono { font-family: var(--mono); font-weight: 400; }
+
+.avatar {
+  display: inline-grid; place-items: center; inline-size: 1.625rem; block-size: 1.625rem; border-radius: 50%;
+  background: oklch(0.88 0.06 30); color: oklch(0.35 0.1 30); font-size: var(--fs-xs); font-weight: 600; flex: none;
+}
+[data-theme="dark"] .avatar { background: oklch(0.38 0.08 30); color: oklch(0.92 0.04 30); }
+
+.spinner { inline-size: var(--icon-sm); block-size: var(--icon-sm); border-radius: 50%; border: 1.5px solid currentColor; border-inline-end-color: transparent; animation: spin 0.7s linear infinite; flex: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- Tabs: one component for the whole app ---------- */
+/* Same height, padding, type and badge in the request, result, sidebar, docs and model views. */
+.tabs { display: flex; align-items: stretch; gap: 0.125rem; padding-inline: calc(var(--pad) - 0.625rem); border-block-end: 1px solid var(--line); min-block-size: var(--tab-h); flex: none; }
+.tab {
+  position: relative; flex: none; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.45rem; block-size: var(--tab-h); padding-inline: 0.625rem;
+  border: 0; background: none; color: var(--text-2); font-size: var(--fs-base); font-weight: 500; cursor: pointer; border-radius: var(--r-sm) var(--r-sm) 0 0;
+}
+.tab:hover { color: var(--text); background: color-mix(in oklch, var(--hover) 60%, transparent); }
+.tab[aria-selected="true"] { color: var(--text); }
+.tab[aria-selected="true"]::after { content: ""; position: absolute; inset-inline: 0.625rem; inset-block-end: -1px; block-size: 2px; background: var(--text); border-radius: 2px; }
+.tab .i { color: var(--text-3); }
+/* Count badge: 18 px, never wider than its digits plus padding. "–" means not run yet. */
+.tab .n {
+  min-inline-size: 1.25rem; block-size: 1.125rem; padding-inline: 0.325rem; border-radius: 999px; background: var(--sunken); border: 1px solid var(--line);
+  color: var(--text-2); font: 500 var(--fs-xs)/1 var(--font); display: inline-grid; place-items: center; font-variant-numeric: tabular-nums;
+}
+.tab .n.unknown { color: var(--text-3); background: transparent; border-color: transparent; }
+/* Issue marker: overlays the label's top end, so it never changes the tab's width. */
+.tab .flag { position: absolute; inset-block-start: 0.6875rem; inset-inline-end: 0.125rem; inline-size: 0.45rem; block-size: 0.45rem; border-radius: 50%; background: var(--danger); box-shadow: 0 0 0 2px var(--bg); }
+.response .tab .flag { box-shadow: 0 0 0 2px var(--panel); }
+.tabs .end { margin-inline-start: auto; display: flex; align-items: center; gap: 0.5rem; }
+
+.segmented { display: inline-flex; padding: 0.1875rem; gap: 0.125rem; border-radius: var(--r); background: var(--sunken); border: 1px solid var(--line); }
+.segmented button { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; border: 0; background: none; block-size: calc(var(--btn-sm-h) - 0.375rem); padding-inline: 0.7rem; border-radius: 0.3rem; font-size: var(--fs-md); font-weight: 500; color: var(--text-2); cursor: pointer; white-space: nowrap; }
+.segmented button[aria-pressed="true"], .segmented button[aria-checked="true"] { background: var(--raised); color: var(--text); box-shadow: var(--shadow-sm); }
+
+/* ---------- App shell ---------- */
+.app { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; block-size: 100vh; min-block-size: 0; }
+.topbar {
+  display: flex; align-items: center; gap: 0.625rem; block-size: var(--topbar-h); padding-inline: 1rem 0.875rem;
+  border-block-end: 1px solid var(--line); background: var(--panel);
+}
+.brand { display: flex; align-items: center; gap: 0.55rem; font-weight: 600; font-size: var(--fs-base); white-space: nowrap; }
+.brand-mark { inline-size: 1.5rem; block-size: 1.5rem; color: var(--mark); display: grid; place-items: center; flex: none; }
+.brand-mark svg { inline-size: 1.25rem; block-size: 1.25rem; }
+.crumb-sep { color: var(--line-strong); }
+.api-switch {
+  display: flex; min-inline-size: 0; white-space: nowrap; align-items: center; gap: 0.5rem; block-size: var(--btn-sm-h); padding-inline: 0.55rem; border-radius: var(--r);
+  border: 0; background: transparent; font-size: var(--fs-base); font-weight: 500; cursor: pointer;
+}
+.api-switch:hover { background: var(--hover); }
+.api-switch .ver { color: var(--text-3); font-weight: 400; }
+.env {
+  display: inline-flex; align-items: center; gap: 0.45rem; block-size: var(--btn-sm-h); padding-inline: 0.65rem; border-radius: var(--r);
+  border: 1px solid var(--line); background: var(--raised); font-size: var(--fs-md); color: var(--text-2); cursor: pointer; white-space: nowrap;
+}
+.env strong { color: var(--text); font-weight: 500; }
+.search-trigger {
+  display: flex; align-items: center; gap: 0.55rem; inline-size: 18rem; block-size: var(--btn-sm-h); padding-inline: 0.7rem 0.35rem;
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--sunken); color: var(--text-3);
+  font-size: var(--fs-base); cursor: pointer;
+}
+.search-trigger .grow { text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.persona {
+  display: flex; align-items: center; gap: 0.5rem; block-size: var(--btn-sm-h); padding-inline: 0.2rem 0.6rem;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--raised); font-size: var(--fs-base); cursor: pointer; white-space: nowrap;
+}
+.persona .role { color: var(--text-3); }
+.persona .avatar { inline-size: 1.375rem; block-size: 1.375rem; }
+.signin-cta { block-size: var(--btn-sm-h); min-block-size: 0; }
+
+/* Three resizable columns. Widths come from the user's last drag (stored per API). */
+.workspace { display: grid; grid-template-columns: var(--side-w, 15.5rem) minmax(0, var(--main-fr, 1fr)) minmax(0, var(--aside-fr, 1fr)); min-block-size: 0; position: relative; }
+/* Try it, Docs and Models fill the same three columns: switching views swaps content, never layout. */
+
+/* Sidebar */
+.sidebar { display: flex; flex-direction: column; min-block-size: 0; border-inline-end: 1px solid var(--line); background: var(--panel); }
+.sidebar .tabs { padding-inline: 0.5rem; }
+.sidebar .tab { flex: 1; justify-content: center; }
+.sidebar-search { padding: 0.75rem 0.75rem 0.5rem; }
+.input-sm {
+  display: flex; align-items: center; gap: 0.5rem; block-size: var(--btn-sm-h); padding-inline: 0.6rem 0.3rem;
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--raised); color: var(--text-3); font-size: var(--fs-base);
+}
+.input-sm.is-focus { border-color: var(--focus); box-shadow: var(--ring); }
+.input-sm input { border: 0; outline: 0; background: none; flex: 1; min-inline-size: 0; padding: 0; font-size: inherit; color: var(--text); }
+.nav { flex: 1; overflow: auto; padding: 0.125rem 0.5rem 1rem; }
+.nav-group + .nav-group { margin-block-start: 0.375rem; }
+.nav-heading {
+  display: flex; align-items: center; gap: 0.4rem; inline-size: 100%; min-block-size: var(--row-h); padding-inline: 0.5rem; border: 0; background: none;
+  font-size: var(--fs-md); font-weight: 500; color: var(--text-3); cursor: pointer; border-radius: var(--r-sm); text-align: start;
+}
+.nav-heading:hover { background: var(--hover); color: var(--text-2); }
+.nav-heading .count { margin-inline-start: auto; font-weight: 400; font-variant-numeric: tabular-nums; }
+.nav ul { list-style: none; margin: 0; padding: 0; }
+.nav-item {
+  display: flex; align-items: center; gap: 0.6rem; min-block-size: var(--row-h); padding-inline: 0.5rem; border-radius: var(--r);
+  color: var(--text-2); text-decoration: none; font-size: var(--fs-base);
+}
+.nav-item > .label-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-inline-size: 0; }
+.nav-item:hover { background: var(--hover); color: var(--text); }
+.nav-item[aria-current="page"] { background: var(--selected); color: var(--text); font-weight: 500; }
+.nav-item .trail { margin-inline-start: auto; color: var(--text-3); display: flex; gap: 0.3rem; align-items: center; flex: none; }
+.nav-item.is-deprecated .label-text { text-decoration: line-through; text-decoration-color: var(--text-3); }
+.nav-item .model-ico { inline-size: 2.125rem; block-size: 1.25rem; display: grid; place-items: center; border-radius: var(--r-sm); font: 600 0.65625rem/1 var(--mono); color: var(--text-2); background: var(--sunken); border: 1px solid var(--line); flex: none; }
+
+/* Panes */
+.pane { display: flex; flex-direction: column; min-block-size: 0; min-inline-size: 0; }
+.pane + .pane { border-inline-start: 1px solid var(--line); }
+.pane-scroll { flex: 1; overflow: auto; min-block-size: 0; scrollbar-gutter: stable; position: relative; }
+.request { background: var(--bg); container-type: inline-size; container-name: request; }
+.response { background: var(--panel); container-type: inline-size; container-name: result; }
+
+/* ---------- v4 shell ---------- */
+/* ---------- 2. Head rows and bottom bars ---------- */
+/* Every head row is exactly as tall as a tab row (.tabs: one tab plus its 1px border). */
+.ctx-bar, .aside-head, .resp-head { display: flex; align-items: center; gap: 0.5rem; block-size: calc(var(--tab-h) + 1px); flex: none; border-block-end: 1px solid var(--line); }
+.ctx-bar { padding-inline: var(--pad) 0.75rem; font-size: var(--fs-md); color: var(--text-3); min-inline-size: 0; }
+.ctx-bar .crumbs { display: flex; align-items: center; gap: 0.35rem; min-inline-size: 0; overflow: hidden; white-space: nowrap; }
+.ctx-bar .crumbs ol { display: flex; align-items: center; gap: 0.35rem; margin: 0; padding: 0; list-style: none; min-inline-size: 0; }
+.ctx-bar .crumbs li { display: flex; align-items: center; gap: 0.35rem; min-inline-size: 0; }
+.ctx-bar .crumbs li + li::before { content: ""; inline-size: 0.875rem; block-size: 0.875rem; flex: none; background: currentColor; opacity: 0.6;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat; }
+[dir="rtl"] .ctx-bar .crumbs li + li::before { transform: scaleX(-1); }
+.ctx-bar .crumbs a { color: var(--text-2); text-decoration: none; border-radius: var(--r-sm); padding-inline: 0.2rem; margin-inline: -0.2rem; overflow: hidden; text-overflow: ellipsis; }
+.ctx-bar .crumbs a:hover { color: var(--text); text-decoration: underline; text-underline-offset: 0.2em; }
+.ctx-bar .crumbs [aria-current] { color: var(--text); font-weight: 500; overflow: hidden; text-overflow: ellipsis; }
+.ctx-bar .end { margin-inline-start: auto; display: flex; align-items: center; gap: 0.5rem; flex: none; }
+.ctx-bar .view-switch { flex: none; }
+.aside-head { padding-inline: var(--pad) 0.75rem; font-size: var(--fs-md); font-weight: 500; color: var(--text); }
+.aside-head .count { color: var(--text-3); font-weight: 400; }
+.aside-head .end { margin-inline-start: auto; display: flex; align-items: center; gap: 0.375rem; }
+.resp-head { padding-inline: var(--pad) 0.75rem; }
+
+/* Bottom bars: the action bar, the result bar, the Docs and Models bars and the sidebar foot. */
+.pane-bar, .actionbar { display: flex; align-items: center; gap: 0.625rem; block-size: var(--bar-h); padding-inline: var(--pad) 1rem; flex: none; border-block-start: 1px solid var(--line); background: var(--panel); }
+.pane-bar .bar-text { flex: 1; min-inline-size: 0; display: flex; align-items: center; gap: 0.5rem; font-size: var(--fs-sm); line-height: 1.35; color: var(--text-3); }
+.pane-bar .bar-text > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pane-bar .bar-text code { font-size: var(--fs-xs); }
+.side-bar { padding-inline: 1rem 0.5rem; }
+
+/* ---------- 3. Signed-out notice ---------- */
+.auth-notice { margin: 0.75rem 0.75rem 0; padding: 0.75rem 0.75rem 0.75rem; border-radius: var(--r-lg); background: var(--accent-soft); border: 1px solid color-mix(in oklch, var(--accent) 22%, transparent); display: grid; gap: 0.5rem; }
+.auth-notice .an-title { display: flex; align-items: center; gap: 0.45rem; color: var(--accent-text); }
+.auth-notice h2 { margin: 0; font-size: var(--fs-base); font-weight: 600; color: var(--text); }
+.auth-notice p { margin: 0; font-size: var(--fs-md); color: var(--text-2); line-height: 1.45; }
+.auth-notice .an-actions { display: flex; gap: 0.375rem; flex-wrap: wrap; }
+.auth-notice .an-actions .btn { flex: 1 1 auto; justify-content: center; }
+.auth-notice .an-actions .btn-primary { flex-basis: 100%; }
+.nav-item .trail .lock { color: var(--accent-text); display: flex; }
+.nav-item .trail > span { display: flex; }
+/* The operation a model was opened from: the current context, not the current page. */
+.nav-item.is-context { box-shadow: inset 2px 0 0 var(--accent); color: var(--text); background: color-mix(in oklch, var(--selected) 55%, transparent); }
+[dir="rtl"] .nav-item.is-context { box-shadow: inset -2px 0 0 var(--accent); }
+.nav-item .trail.num { font-variant-numeric: tabular-nums; font-size: var(--fs-sm); }
+.nav-group > ul[hidden] { display: none; }
+
+
+/* Operation header */
+.op-head { padding: 1.25rem var(--pad) 0; }
+.op-crumbs { display: flex; align-items: center; gap: 0.5rem; font-size: var(--fs-md); color: var(--text-3); min-block-size: 2rem; }
+.op-title-row { display: flex; align-items: center; gap: 0.75rem; margin-block-start: 0.25rem; }
+.op-title { margin: 0; font-size: var(--fs-xl); font-weight: 600; letter-spacing: -0.014em; line-height: 1.25; }
+.op-desc { margin: 0.375rem 0 0; color: var(--text-2); font-size: var(--fs-base); max-inline-size: 64ch; }
+.op-notice { display: flex; align-items: center; gap: 0.6rem; margin-block-start: 0.875rem; padding: 0.55rem 0.6rem 0.55rem 0.8rem; border-radius: var(--r-lg); border: 1px solid var(--line); background: var(--raised); font-size: var(--fs-md); }
+.op-notice .i { color: var(--text-3); }
+.op-notice.warn { background: var(--warn-soft); border-color: transparent; }
+.op-notice.warn > .i { color: var(--warn); }
+.op-notice.auth { background: var(--accent-soft); border-color: transparent; }
+.op-notice.auth > .i { color: var(--accent-text); }
+.op-notice .grow { min-inline-size: 0; }
+.op-notice strong { font-weight: 600; }
+
+/* URL bar: method, base URL (faint), path. Always LTR, even in RTL layouts. */
+.urlbar {
+  display: flex; align-items: center; gap: 0.55rem; margin-block-start: 1rem; block-size: var(--control-h); padding-inline: 0.35rem 0.3rem;
+  border: 1px solid var(--line-strong); border-radius: var(--r); background: var(--raised); box-shadow: var(--shadow-sm);
+  font: 400 var(--fs-base)/1 var(--mono); direction: ltr;
+}
+.urlbar .url { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.urlbar .base { color: var(--text-3); }
+.urlbar .token { display: inline-flex; align-items: center; gap: 0.3rem; block-size: 1.375rem; padding-inline: 0.4rem; border-radius: var(--r-sm); background: var(--accent-soft); color: var(--accent-text); vertical-align: middle; }
+.request > .pane-scroll > .tabs { margin-block-start: 1rem; }
+
+/* ---------- Copy feedback ---------- */
+/* The icon swaps to a check and a "Copied" bubble overlays the button for 1.5 s.
+   Nothing reflows: the bubble is absolutely positioned and the button keeps its size. */
+.copy { position: relative; }
+.copy .i-done { display: none; }
+.copy.is-copied { color: var(--ok); }
+.copy.is-copied .i-idle { display: none; }
+.copy.is-copied .i-done { display: block; }
+.copied-bubble {
+  position: absolute; inset-block-end: calc(100% + 0.4rem); inset-inline-end: 0; z-index: 20;
+  display: inline-flex; align-items: center; gap: 0.35rem; block-size: 1.5rem; padding-inline: 0.55rem; border-radius: var(--r);
+  background: oklch(0.24 0.012 268); color: oklch(0.97 0.003 268); font: 500 var(--fs-sm)/1 var(--font); white-space: nowrap; box-shadow: var(--shadow-pop);
+  pointer-events: none;
+}
+[data-theme="dark"] .copied-bubble { background: oklch(0.34 0.01 268); }
+.copied-bubble .i { color: oklch(0.82 0.13 155); }
+/* Text buttons swap their label inside a width that fits both words. */
+.copy-label { display: inline-grid; }
+.copy-label > span { grid-area: 1 / 1; }
+.copy-label > span:last-child { visibility: hidden; }
+.copy.is-copied .copy-label > span:first-child { visibility: hidden; }
+.copy.is-copied .copy-label > span:last-child { visibility: visible; }
+
+/* ---------- Form ---------- */
+.form { padding: 1.25rem var(--pad) 2rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+fieldset { border: 0; padding: 0; margin: 0; min-inline-size: 0; }
+.section-label {
+  display: flex; align-items: center; gap: 0.55rem; inline-size: 100%; margin: 0 0 0.875rem; padding: 0;
+  font-size: var(--fs-md); font-weight: 500; color: var(--text-3);
+}
+.section-label .schema { font: 400 var(--fs-sm)/1 var(--mono); }
+.section-label .schema-link { font: 400 var(--fs-sm)/1 var(--mono); color: var(--accent-text); text-decoration: none; border-block-end: 1px dotted currentColor; }
+.section-label .rule { flex: 1; block-size: 1px; background: var(--line); }
+.form-note { margin: -0.5rem 0 0.875rem; font-size: var(--fs-sm); color: var(--text-3); }
+@container request (max-width: 30rem) { #autofill .lbl { display: none; } }
+/* v5 field anatomy (mocks 76, 84): label row, control, description, one reserved status line.
+   Fields sit on a subgrid, so in two columns the four rows line up across a pair whatever each
+   description's length. Parameter holders are display: contents, so their field is the grid item. */
+.fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 1.125rem; row-gap: 0; }
+.param-holder, .param-holder > div { display: contents; }
+:is(.fields, .param-holder > div) > .field { grid-column: 1 / -1; grid-row: span 4; grid-template-rows: subgrid; }
+:is(.fields, .param-holder > div) > .field.half { grid-column: auto; }
+:is(.fields, .param-holder > div) > .field.row-start { grid-column: 1; }
+.param-holder[data-half] > div > .field { grid-column: auto; }
+.param-holder[data-half="start"] > div > .field { grid-column: 1; }
+.field { display: grid; grid-template-rows: auto auto auto auto; row-gap: 0; min-inline-size: 0; padding-block-end: 0.75rem; }
+.label { display: flex; align-items: center; gap: 0.375rem; min-inline-size: 0; min-block-size: 1.5rem; margin-block-end: 0.375rem; font-size: var(--fs-base); font-weight: 500; }
+.label .name { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.label .opt { font-weight: 400; color: var(--text-3); font-size: var(--fs-sm); }
+.label .end { margin-inline-start: auto; display: flex; align-items: center; gap: 0.625rem; flex: none; }
+.label .type { font: 400 var(--fs-sm)/1 var(--mono); color: var(--text-3); white-space: nowrap; direction: ltr; }
+.field-clear { block-size: 1.5rem; padding-inline: 0.3125rem; margin-inline: -0.3125rem 0; border: 0; border-radius: var(--r-sm); background: none; color: var(--accent-text); font: 500 var(--fs-sm)/1 var(--font); cursor: pointer; }
+.field-clear:hover { background: var(--accent-soft); }
+/* The "i" toggletip trigger: 24 px target, 16 px glyph, sits right after the label text. */
+.info-btn {
+  display: inline-grid; place-items: center; inline-size: 1.5rem; block-size: 1.5rem; margin-inline-start: -0.15rem; padding: 0; border: 0; border-radius: 50%;
+  background: none; color: var(--text-3); cursor: pointer; flex: none;
+}
+.info-btn:hover, .info-btn[aria-expanded="true"] { color: var(--accent-text); background: var(--accent-soft); }
+.info-btn .i { inline-size: 1rem; block-size: 1rem; }
+/* The description: the spec's words, flush with the control, at a readable measure. */
+.f-desc { margin: 0.4375rem 0 0; font-size: var(--fs-md); line-height: 1.45; color: var(--text-2); max-inline-size: 70ch; }
+.f-desc:empty { margin: 0; }
+.f-desc code, .assist code { font-size: var(--fs-xs); padding: 0.0625rem 0.25rem; border-radius: var(--r-sm); background: var(--code-bg); color: var(--text-2); }
+/* One reserved line: constraints, what gets sent, or the error. It never pushes the next field. */
+.assist {
+  display: flex; align-items: center; gap: 0.375rem; min-inline-size: 0; min-block-size: var(--assist-h); margin-block-start: 0.125rem;
+  font-size: var(--fs-sm); line-height: 1.3; color: var(--text-3);
+}
+.f-desc:empty + .assist { margin-block-start: 0.375rem; }
+.assist > .msg { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.assist .count { margin-inline-start: auto; font: 400 var(--fs-xs)/1 var(--mono); font-variant-numeric: tabular-nums; }
+.assist.is-error { color: var(--danger); font-weight: 500; }
+.assist.is-error code { color: inherit; }
+.assist.is-error .count { color: var(--danger); }
+.assist.is-generated { color: var(--accent-text); }
+.assist .undo { margin-inline-start: auto; display: inline-flex; align-items: center; gap: 0.35rem; block-size: var(--assist-h); padding: 0 0.15rem; border: 0; background: none; color: var(--accent-text); font: 500 var(--fs-sm)/1 var(--font); cursor: pointer; }
+.assist .undo .kbd { block-size: 1.125rem; min-inline-size: 1.125rem; font-size: 0.6875rem; }
+
+.control {
+  position: relative; display: flex; align-items: center; gap: 0.55rem; min-inline-size: 0; block-size: var(--control-h); padding-inline: 0.75rem 0.3rem;
+  border: 1px solid var(--line-strong); border-radius: var(--r); background: var(--raised); box-shadow: var(--shadow-sm);
+  transition: border-color 120ms var(--ease), box-shadow 120ms var(--ease);
+}
+.control:hover { border-color: color-mix(in oklch, var(--line-strong) 60%, var(--text-3)); }
+.control input { flex: 1; min-inline-size: 0; inline-size: 100%; border: 0; outline: 0; background: none; padding: 0; block-size: 100%; font-size: var(--fs-base); }
+.control input::placeholder, .control .placeholder { color: var(--text-3); }
+.control .num { font-variant-numeric: tabular-nums; }
+.control .lead { color: var(--text-3); display: flex; }
+.control .trail { color: var(--text-3); font-size: var(--fs-sm); white-space: nowrap; }
+/* A control with trailing text sizes its input to the value, so the value is never clipped. */
+.control:has(.trail) input { flex: 0 1 auto; inline-size: auto; }
+.control .trail { margin-inline-start: auto; overflow: hidden; text-overflow: ellipsis; min-inline-size: 0; }
+/* Fixed-size status slot at the end of every control: error, generated, spinner or the wand. */
+.control .slot { inline-size: 1.75rem; block-size: 1.75rem; display: grid; place-items: center; flex: none; color: var(--text-3); border-radius: var(--r-sm); border: 0; background: none; padding: 0; }
+.control .slot.err { color: var(--danger); }
+.control .slot.wand { cursor: pointer; }
+.control .slot.wand:hover, .control .slot.wand.is-active { background: var(--accent-soft); color: var(--accent-text); }
+.control .slot.gen { color: var(--accent-text); }
+.control.is-focus { border-color: var(--focus); box-shadow: var(--ring); }
+.control.is-invalid { border-color: var(--danger-line); background: color-mix(in oklch, var(--danger-soft) 45%, var(--raised)); }
+.control.is-invalid.is-focus { box-shadow: var(--ring-danger); border-color: var(--danger); }
+.control.is-generated { background: color-mix(in oklch, var(--accent-soft) 40%, var(--raised)); }
+.control .mono-val { font: 400 var(--fs-base)/1 var(--mono); }
+
+.control-split { padding: 0; }
+.control-split > .part { display: flex; align-items: center; gap: 0.45rem; block-size: 100%; padding-inline: 0.75rem 0.3rem; }
+.control-split > .part:first-child { flex: 1; min-inline-size: 0; }
+.control-split > .part + .part { border-inline-start: 1px solid var(--line); padding-inline: 0.65rem 0.55rem; font-weight: 500; font-size: var(--fs-base); flex: none; cursor: pointer; }
+
+.picked { display: flex; align-items: center; gap: 0.6rem; flex: 1; min-inline-size: 0; }
+.picked .main { font-weight: 500; white-space: nowrap; }
+.picked .sub { min-inline-size: 0; color: var(--text-3); font-size: var(--fs-sm); font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: ltr; }
+.chip-ico { inline-size: 1.5rem; block-size: 1.5rem; border-radius: var(--r-sm); display: grid; place-items: center; background: var(--sunken); border: 1px solid var(--line); color: var(--text-2); font-size: var(--fs-xs); font-weight: 600; flex: none; }
+
+.list-input { border: 1px solid var(--line-strong); border-radius: var(--r); background: var(--raised); overflow: hidden; box-shadow: var(--shadow-sm); }
+.list-input .li { display: flex; align-items: center; gap: 0.6rem; padding-inline: 0.75rem 0.3rem; block-size: var(--control-h); border-block-end: 1px solid var(--line); }
+.list-input .li .idx { font: 400 var(--fs-xs)/1 var(--mono); color: var(--text-3); inline-size: 1rem; }
+.list-input .li .val { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-input .add { display: flex; align-items: center; gap: 0.5rem; inline-size: 100%; block-size: var(--control-h); padding-inline: 0.75rem 0.4rem; border: 0; background: none; color: var(--text-3); font-size: var(--fs-base); cursor: pointer; }
+.list-input .add .kbd { margin-inline-start: auto; }
+
+.optional-props { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; grid-column: 1 / -1; padding-block-start: 0.125rem; }
+.optional-props .lead-label { font-size: var(--fs-sm); color: var(--text-3); margin-inline-end: 0.15rem; }
+.prop-chip {
+  display: inline-flex; align-items: center; gap: 0.4rem; block-size: var(--btn-sm-h); padding-inline: 0.45rem 0.65rem; border-radius: var(--r);
+  border: 1px solid var(--line); background: transparent; color: var(--text-2); font: 400 var(--fs-md)/1 var(--font); cursor: pointer;
+}
+.prop-chip:hover { background: var(--hover); color: var(--text); border-color: var(--line-strong); }
+.prop-chip .t { font: 400 var(--fs-xs)/1 var(--mono); color: var(--text-3); }
+
+/* ---------- Select: looks like an input, with a joined trigger (mocks 76–80) ---------- */
+.sel { padding-inline-end: 0; gap: 0.375rem; cursor: pointer; outline: 0; }
+.sel-value { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sel-value.placeholder, .sel .placeholder { color: var(--text-3); }
+.sel-trigger { align-self: stretch; display: grid; place-items: center; inline-size: calc(var(--control-h) - 0.125rem); flex: none; margin-inline-start: 0.125rem;
+  border-inline-start: 1px solid var(--line); background: var(--panel); color: var(--text-2);
+  border-start-end-radius: calc(var(--r) - 1px); border-end-end-radius: calc(var(--r) - 1px); transition: background 120ms var(--ease), color 120ms var(--ease); }
+.sel-trigger .i, .sel-chev .i { transition: rotate 120ms var(--ease); }
+.sel:hover .sel-trigger { background: var(--hover); color: var(--text); }
+.sel.is-open .sel-trigger { background: var(--accent-soft); color: var(--accent-text); }
+.sel.is-open .sel-trigger .i, .sel-seg.is-open .sel-chev .i { rotate: 180deg; }
+.sel.is-invalid .sel-trigger { border-inline-start-color: color-mix(in oklch, var(--danger-line) 50%, var(--line)); background: transparent; }
+.sel.is-disabled { background: var(--sunken); box-shadow: none; border-color: var(--line); cursor: not-allowed; }
+.sel.is-disabled > * { opacity: 0.6; }
+.sel.is-disabled .sel-trigger { background: transparent; }
+.control-split > .sel-seg { gap: 0.375rem; padding-inline: 0.65rem 0.55rem; background: var(--panel); color: var(--text); outline: 0; cursor: pointer;
+  border-start-end-radius: calc(var(--r) - 1px); border-end-end-radius: calc(var(--r) - 1px); }
+.control-split > .sel-seg:hover { background: var(--hover); }
+.control-split > .sel-seg:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+.control-split > .sel-seg .sel-chev { display: flex; color: var(--text-2); }
+.control-split > .sel-seg .sel-value { flex: none; }
+.lk .picked { display: flex; align-items: center; gap: 0.6rem; flex: 1; min-inline-size: 0; }
+.lk .picked .main { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-inline-size: 0; flex: 0 1 auto; }
+.lk .picked .placeholder { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* RTL: spec values keep their own direction but line up with the start edge. */
+[dir="rtl"] :is(.sel-value, .lk .picked .main) { text-align: right; }
+/* Trailing text (a weekday) keeps its width when the wand appears beside it. */
+.control .trail { flex: none; overflow: visible; }
+.control:has(.trail) input { flex: 1 1 auto; inline-size: 100%; }
+
+/* ---------- Radio group for short enums (mocks 76, 82, m18) ---------- */
+/* Separate options with a radio dot: the chosen one has a filled dot, an accent border and a
+   tint, three cues that work in both themes. Its label is set bold-wide in advance, so
+   choosing never moves its neighbours. */
+.rg { display: flex; flex-wrap: wrap; gap: 0.375rem; min-inline-size: 0; }
+.rg-opt { display: inline-flex; align-items: center; gap: 0.5rem; min-block-size: var(--control-h); padding-inline: 0.625rem 0.75rem; border: 1px solid var(--line-strong); border-radius: var(--r);
+  background: var(--raised); box-shadow: var(--shadow-sm); color: var(--text-2); font-size: var(--fs-base); white-space: nowrap; cursor: pointer; outline: 0;
+  transition: border-color 120ms var(--ease), background 120ms var(--ease); }
+.rg-opt > span:last-child { display: inline-grid; }
+.rg-opt > span:last-child::after { content: attr(data-label); grid-area: 1 / 1; font-weight: 500; visibility: hidden; block-size: 0; }
+.rg-opt:hover { background: var(--hover); color: var(--text); border-color: color-mix(in oklch, var(--line-strong) 60%, var(--text-3)); }
+.rg-dot { inline-size: 1rem; block-size: 1rem; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1.5px var(--text-3); background: var(--raised); transition: box-shadow 120ms var(--ease); }
+.rg-opt[aria-checked="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--text); font-weight: 500; box-shadow: inset 0 0 0 1px var(--accent); }
+.rg-opt[aria-checked="true"] .rg-dot { box-shadow: inset 0 0 0 0.3125rem var(--accent); background: var(--on-accent); }
+.rg-opt:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.rg.is-invalid .rg-opt { border-color: var(--danger-line); background: color-mix(in oklch, var(--danger-soft) 45%, var(--raised)); }
+.rg.is-disabled .rg-opt { background: var(--sunken); box-shadow: none; border-color: var(--line); color: var(--text-3); cursor: not-allowed; }
+.rg.is-disabled .rg-opt[aria-checked="true"] { border-color: var(--line-strong); }
+.rg.is-disabled .rg-opt[aria-checked="true"] .rg-dot { box-shadow: inset 0 0 0 0.3125rem var(--text-3); }
+
+/* ---------- Listbox popover: selects, the ID lookup, the language picker ---------- */
+/* The active (keyboard) row is tinted; the chosen row has an accent check. */
+.lb { display: flex; flex-direction: column; min-inline-size: 16rem; max-inline-size: min(32rem, calc(100vw - 1.5rem)); z-index: 70; }
+.lb-search { display: flex; align-items: center; gap: 0.5rem; block-size: 2.5rem; padding-inline: 0.75rem; border-block-end: 1px solid var(--line); color: var(--text-3); flex: none; }
+.lb-search input { flex: 1; min-inline-size: 0; border: 0; outline: 0; background: none; padding: 0; font-size: var(--fs-base); color: var(--text); }
+.lb-search input::placeholder { color: var(--text-3); }
+.lb-count { font-size: var(--fs-xs); color: var(--text-3); white-space: nowrap; }
+.lb-list { list-style: none; margin: 0; padding: 0.25rem; overflow: auto; max-block-size: 19rem; outline: 0; min-block-size: 0; }
+.lb-opt { display: flex; align-items: flex-start; gap: 0.5rem; min-block-size: 2rem; padding: 0.4375rem 0.625rem 0.4375rem 0.5rem; border-radius: var(--r); cursor: pointer; }
+.lb-opt.is-active { background: var(--hover); }
+.lb-list:focus-visible .lb-opt.is-active { box-shadow: inset 0 0 0 2px var(--focus); }
+.lb-opt.is-unset { margin-block-end: 0.25rem; position: relative; }
+.lb-opt.is-unset::after { content: ""; position: absolute; inset-inline: 0.5rem; inset-block-end: -0.1875rem; block-size: 1px; background: var(--line); }
+.lb-check { display: flex; inline-size: var(--icon-sm); block-size: 1.35em; align-items: center; flex: none; color: var(--accent-text); }
+.lb-check .i { stroke-width: 2.2; }
+.lb-text { display: grid; gap: 0.0625rem; min-inline-size: 0; flex: 1; line-height: 1.35; }
+.lb-text .v { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-text .v.mono { font: 400 var(--fs-md)/1.45 var(--mono); }
+.lb-opt[aria-selected="true"] .v { font-weight: 500; }
+.lb-opt.is-unset .v { color: var(--text-2); }
+.lb-text .d { font-size: var(--fs-sm); color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-text .d.mono { font-family: var(--mono); font-size: var(--fs-xs); direction: ltr; unicode-bidi: isolate; text-align: start; }
+.lb mark { background: none; color: var(--accent-text); font-weight: 600; }
+.lb-empty { padding: 0.875rem 0.75rem; color: var(--text-3); font-size: var(--fs-md); }
+.lb .pop-foot { gap: 0.875rem; padding: 0.5rem 0.75rem; flex-wrap: wrap; row-gap: 0.25rem; flex: none; }
+.lb .pop-foot .kbd { margin-inline-end: 0.125rem; }
+.lb .typed code { color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 0 0.25rem; font-size: var(--fs-xs); }
+.lb-group { display: flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.625rem 0.25rem; font-size: var(--fs-xs); font-weight: 500; color: var(--text-3); }
+.lb-group .spinner { inline-size: 0.75rem; block-size: 0.75rem; }
+.lb-sep { block-size: 1px; background: var(--line); margin: 0.25rem 0.5rem; }
+.lb-opt .chip-ico { margin-block-start: 0.0625rem; }
+.lb-opt .end { margin-inline-start: auto; display: flex; align-items: center; gap: 0.375rem; flex: none; font: 400 var(--fs-xs)/1.3 var(--mono); color: var(--text-3); padding-block-start: 0.1875rem; }
+.lb-opt .end .tag { font-family: var(--font); }
+.lb-opt .lead-ico { display: flex; color: var(--text-3); padding-block-start: 0.0625rem; }
+.lb-state { display: grid; gap: 0.375rem; justify-items: start; padding: 0.875rem 0.75rem 0.75rem; font-size: var(--fs-md); color: var(--text-2); }
+.lb-state strong { color: var(--text); font-weight: 500; display: flex; align-items: center; gap: 0.4rem; }
+.lb-state p { margin: 0; color: var(--text-3); font-size: var(--fs-sm); }
+.lb-state.is-error strong .i { color: var(--danger); }
+.lb-state .btn { margin-block-start: 0.25rem; }
+.lb-sk { display: flex; align-items: center; gap: 0.5rem; min-block-size: 2.75rem; padding-inline: 1.5rem 0.625rem; }
+.lb-sk .sk-box { inline-size: 1.5rem; block-size: 1.5rem; border-radius: var(--r-sm); flex: none; }
+.lb-sk .stack { display: grid; gap: 0.375rem; flex: 1; }
+.lb-sk .thin { block-size: 0.55rem; }
+/* The lookup's source: one line. The query string truncates first, then the path. */
+.lb-src { display: flex; align-items: center; gap: 0.4375rem; padding: 0.5rem 0.75rem; border-block-start: 1px solid var(--line); background: var(--panel); font-size: var(--fs-sm); color: var(--text-3); min-inline-size: 0; white-space: nowrap; flex: none; }
+.lb-src > .i { flex: none; }
+.lb-src > .src-q { display: inline-flex; min-inline-size: 0; flex: 0 1 auto; overflow: hidden; font-size: var(--fs-xs); color: var(--text-2); }
+.lb-src > .src-q > span:first-child { flex: 0 1 auto; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+.lb-src > .src-q > .qs { flex: 0 10000 auto; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+.lb-src > .meta { flex: none; }
+.lb-src > .spacer { flex: 1; min-inline-size: 0.25rem; }
+.lb-src > .btn { flex: none; margin-block: -0.25rem; }
+/* Touch has no keys to advertise. */
+@media (pointer: coarse) { .lb .pop-foot { display: none; } }
+
+/* Bottom sheet: a select, the lookup and the language picker on a phone (mocks m19, m20, m24, m25). */
+.sheet-head { display: none; }
+.sheet-scrim { position: fixed; inset: 0; z-index: 65; background: oklch(0.2 0.02 268 / 0.4); }
+[data-theme="dark"] .sheet-scrim { background: oklch(0 0 0 / 0.55); }
+.lb.is-sheet { position: fixed !important; inset: auto 0 0 0 !important; inline-size: auto !important; max-inline-size: none; max-block-size: min(78vh, 44rem); z-index: 70;
+  border-radius: 0.875rem 0.875rem 0 0; box-shadow: 0 -12px 40px -12px oklch(0.2 0.02 268 / 0.35); padding-block-end: max(env(safe-area-inset-bottom), 0.5rem); }
+.lb.is-sheet .sheet-head { display: flex; align-items: flex-start; gap: 0.5rem; position: relative; padding-block: 1.125rem 0.5rem; padding-inline: 1rem 0.375rem; border-block-end: 1px solid var(--line); flex: none; }
+.lb.is-sheet .grab { position: absolute; inset-block-start: 0.4375rem; inset-inline-start: 50%; translate: -50% 0; inline-size: 2.25rem; block-size: 0.25rem; border-radius: 999px; background: var(--line-strong); }
+[dir="rtl"] .lb.is-sheet .grab { translate: 50% 0; }
+.lb.is-sheet .sheet-title { flex: 1; min-inline-size: 0; display: grid; gap: 0.125rem; padding-block-start: 0.375rem; }
+.lb.is-sheet .sheet-title strong { font-size: var(--fs-lg); font-weight: 600; overflow-wrap: anywhere; }
+.lb.is-sheet .sheet-title span { font-size: var(--fs-sm); color: var(--text-3); }
+.lb.is-sheet .sheet-head .btn-icon { inline-size: 2.75rem; block-size: 2.75rem; }
+.lb.is-sheet .lb-search { block-size: 3rem; }
+.lb.is-sheet .lb-list { max-block-size: none !important; flex: 1; padding: 0.375rem; }
+.lb.is-sheet .lb-opt { min-block-size: 2.75rem; padding-block: 0.5rem; }
+.lb.is-sheet .lb-text .d { white-space: normal; }
+.lb.is-sheet .pop-foot { display: none; }
+.lb.is-sheet .lb-src { padding-block: 0.625rem; }
+.lb.is-sheet .lb-src .who { display: none; }
+
+/* ---------- Action bar ---------- */
+/* The status line wraps to two lines instead of truncating; the bar is tall enough for both. */
+.actionbar .status { flex: 1; min-inline-size: 0; display: flex; align-items: center; gap: 0.5rem; font-size: var(--fs-sm); line-height: 1.35; color: var(--text-3); }
+.actionbar .status > span:not(.spinner) { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.actionbar .status.is-ok { color: var(--accent-text); }
+.issues-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem; block-size: var(--btn-sm-h); padding-inline: 0.65rem 0.35rem; border-radius: var(--r);
+  border: 1px solid color-mix(in oklch, var(--danger) 35%, transparent); background: var(--danger-soft); color: var(--danger);
+  font-size: var(--fs-md); font-weight: 500; cursor: pointer; flex: none;
+}
+.issues-btn .kbd { background: transparent; border-color: color-mix(in oklch, var(--danger) 30%, transparent); color: var(--danger); }
+/* Fixed widths: the spinner, the copied state and locale changes never move the bar.
+   Widths are per locale and platform (set from i18n.js) and in em, so they follow density and
+   text size. Icon, label and keycap are centred with one gap between them, so the space at
+   both ends is always equal and the keycap never touches the edge. */
+.btn-run { justify-content: center; gap: 0.5rem; padding-inline: 0.75rem; }
+.btn-preview { inline-size: var(--w-preview, 10em); }
+.btn-send { inline-size: var(--w-send, 9.5em); }
+
+/* ---------- Popovers, menus, toggletips ---------- */
+.pop {
+  position: absolute; z-index: 30; background: var(--raised); border-radius: var(--r-lg); box-shadow: var(--shadow-pop);
+  overflow: hidden; font-size: var(--fs-base);
+}
+.pop-head { display: flex; align-items: center; gap: 0.55rem; padding: 0.75rem 0.875rem; border-block-end: 1px solid var(--line); font-weight: 600; }
+.pop-group { padding: 0.375rem; }
+.pop-group + .pop-group { border-block-start: 1px solid var(--line); }
+.pop-label { display: flex; align-items: center; gap: 0.45rem; padding: 0.45rem 0.55rem 0.3rem; font-size: var(--fs-sm); font-weight: 500; color: var(--text-3); }
+.opt-row { display: flex; align-items: center; gap: 0.65rem; min-block-size: var(--control-h); padding: 0.35rem 0.55rem; border-radius: var(--r); color: var(--text-2); cursor: pointer; }
+.opt-row .main { color: var(--text); font-weight: 500; white-space: nowrap; }
+.opt-row .sub { color: var(--text-3); font-size: var(--fs-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-inline-size: 0; }
+.opt-row .stack { display: grid; min-inline-size: 0; flex: 1; line-height: 1.35; }
+.opt-row .end { margin-inline-start: auto; display: flex; align-items: center; gap: 0.45rem; color: var(--text-3); font-size: var(--fs-sm); flex: none; }
+.opt-row[aria-selected="true"], .opt-row.is-active { background: var(--selected); }
+.opt-row mark { background: none; color: var(--accent-text); font-weight: 600; }
+.pop-foot { display: flex; align-items: center; gap: 1rem; padding: 0.55rem 0.875rem; border-block-start: 1px solid var(--line); background: var(--panel); font-size: var(--fs-sm); color: var(--text-3); }
+.pop-foot span { display: inline-flex; align-items: center; gap: 0.35rem; }
+
+.tooltip {
+  position: absolute; z-index: 40; display: grid; gap: 0.2rem; padding: 0.45rem 0.6rem; border-radius: var(--r);
+  background: oklch(0.24 0.012 268); color: oklch(0.97 0.003 268); font-size: var(--fs-sm); box-shadow: var(--shadow-pop); max-inline-size: 18rem;
+}
+.tooltip .row { display: flex; align-items: center; gap: 0.6rem; white-space: nowrap; }
+.tooltip .sub { color: oklch(0.8 0.008 268); white-space: normal; }
+.tooltip .kbd { background: oklch(1 0 0 / 0.1); border-color: oklch(1 0 0 / 0.16); color: oklch(0.94 0.005 268); margin-inline-start: auto; }
+[data-theme="dark"] .tooltip { background: oklch(0.32 0.01 268); }
+
+/* Toggletip: opens on hover, focus or click; Esc or a click outside closes it. */
+.toggletip { inline-size: 23rem; padding: 0; overflow: visible; }
+.toggletip::before { content: ""; position: absolute; inset-block-start: -0.35rem; inset-inline-start: var(--arrow, 1.25rem); inline-size: 0.7rem; block-size: 0.7rem; background: var(--raised); rotate: 45deg; box-shadow: -1px -1px 0 oklch(0.2 0.02 268 / 0.08); }
+.tt-body { padding: 0.875rem 1rem; display: grid; gap: 0.625rem; font-size: var(--fs-md); color: var(--text-2); }
+.tt-body h3 { margin: 0; font-size: var(--fs-base); color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
+.tt-body h3 .tag { margin-inline-start: auto; }
+.tt-body p { margin: 0; }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.3rem 0.875rem; margin: 0; font-size: var(--fs-sm); }
+.facts dt { color: var(--text-3); }
+.facts dd { margin: 0; color: var(--text); font-family: var(--mono); font-size: var(--fs-sm); min-inline-size: 0; overflow-wrap: anywhere; }
+.facts dd.plain { font-family: var(--font); }
+.tt-foot { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 1rem; border-block-start: 1px solid var(--line); background: var(--panel); border-radius: 0 0 var(--r-lg) var(--r-lg); font-size: var(--fs-sm); color: var(--text-3); }
+
+/* ---------- Headers editor ---------- */
+.kv-toolbar { display: flex; align-items: center; gap: 0.5rem; margin-block-end: 0.75rem; }
+.kv-table { border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--raised); box-shadow: var(--shadow-sm); overflow: hidden; }
+.kv-row { display: grid; grid-template-columns: 2.25rem minmax(0, 0.85fr) minmax(0, 1.15fr) 4.5rem; align-items: stretch; min-block-size: var(--control-h); border-block-start: 1px solid var(--line); position: relative; }
+.kv-row.head { min-block-size: 2.25rem; border-block-start: 0; font-size: var(--fs-sm); font-weight: 500; color: var(--text-3); background: var(--panel); }
+.kv-row.group { display: flex; align-items: center; gap: 0.5rem; min-block-size: 2rem; padding-inline: 0.875rem; background: var(--panel); font-size: var(--fs-sm); font-weight: 500; color: var(--text-3); }
+.kv-row > .c { display: flex; align-items: center; gap: 0.45rem; min-inline-size: 0; padding-inline: 0.7rem; }
+.kv-row > .c + .c { border-inline-start: 1px solid var(--line); }
+.kv-row .c.check { justify-content: center; padding: 0; }
+.kv-row .c.acts { justify-content: flex-end; gap: 0.1rem; padding-inline: 0.3rem; }
+.kv-row .name { font: 500 var(--fs-md)/1 var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr; }
+.kv-row .val { font: 400 var(--fs-md)/1 var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); flex: 1; min-inline-size: 0; direction: ltr; text-align: start; }
+.kv-row.is-managed .name, .kv-row.is-managed .val { color: var(--text-2); }
+.kv-row .placeholder { color: var(--text-3); font-weight: 400; }
+.checkbox { inline-size: 1.125rem; block-size: 1.125rem; border-radius: 0.3rem; border: 1px solid var(--line-strong); background: var(--raised); display: grid; place-items: center; color: var(--on-accent); flex: none; }
+.checkbox.on { background: var(--accent); border-color: transparent; }
+.checkbox.on svg { inline-size: 0.75rem; block-size: 0.75rem; stroke-width: 2.6; }
+.checkbox.locked { background: var(--sunken); border-color: var(--line); color: var(--text-3); }
+.checkbox.locked svg { inline-size: 0.7rem; block-size: 0.7rem; }
+
+/* ---------- Result pane ---------- */
+.status-code { white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; font-size: var(--fs-base); }
+.status-code.ok { color: var(--ok); }
+/* Status codes take their class's hue everywhere: 2xx success, 3xx info, 4xx warning, 5xx danger. */
+.status-code.err, .status-code.danger { color: var(--danger); }
+.status-code.warn { color: var(--warn); }
+.status-code.info { color: var(--info); }
+.metric { white-space: nowrap; font: 400 var(--fs-md)/1 var(--mono); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.response .tabs { padding-inline: 0.5rem; }
+/* Tabs never wrap or hide. When a pane is dragged narrow they scroll, and a fade at the
+   end says there are more. The selected tab is scrolled into view. */
+.response .tabs, .request .tabs { overflow-x: auto; scrollbar-width: none; }
+@container result (max-width: 37rem) {
+  .tabs.scrolls { mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent); }
+  [dir="rtl"] .tabs.scrolls { mask-image: linear-gradient(to left, #000 calc(100% - 2.5rem), transparent); }
+}
+.result-body { padding: 1.25rem var(--pad) 1.75rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.875rem; align-content: start; }
+
+.banner { display: flex; gap: 0.7rem; align-items: flex-start; padding: 0.75rem 0.875rem; border-radius: var(--r-lg); background: var(--accent-soft); color: var(--text); font-size: var(--fs-base); }
+.banner > .i { color: var(--accent-text); margin-block-start: 0.15rem; }
+.banner code { font-size: var(--fs-sm); }
+.banner-ok { background: var(--ok-soft); }
+.banner-ok > .i { color: var(--ok); }
+.banner-neutral { background: var(--sunken); border: 1px solid var(--line); }
+.banner-neutral > .i { color: var(--text-3); }
+
+.table-change { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); overflow: hidden; }
+.tc-head { display: flex; align-items: center; gap: 0.6rem; block-size: 2.5rem; padding-inline: 0.875rem; border-block-end: 1px solid var(--line); font-size: var(--fs-base); }
+.tc-head .name { font-family: var(--mono); font-weight: 500; font-size: var(--fs-md); direction: ltr; }
+.op-badge { display: inline-flex; align-items: center; block-size: 1.25rem; padding-inline: 0.4rem; border-radius: var(--r-sm); font: 600 0.65625rem/1 var(--mono); }
+.op-ins { color: var(--ok); background: var(--ok-soft); }
+.op-upd { color: var(--warn); background: var(--warn-soft); }
+.kv { display: grid; grid-template-columns: 9rem minmax(0, 1fr); font-size: var(--fs-base); }
+.kv > div { padding: 0.5rem 0.875rem; border-block-end: 1px solid var(--line); min-inline-size: 0; }
+.kv > div:nth-last-child(-n+2) { border-block-end: 0; }
+.kv .k { color: var(--text-3); font-family: var(--mono); font-size: var(--fs-md); direction: ltr; text-align: start; }
+.kv .v { font-family: var(--mono); font-size: var(--fs-md); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kv .v.new { color: var(--ok); }
+.kv .v, .metric { unicode-bidi: plaintext; }
+.kv .old { color: var(--text-3); text-decoration: line-through; }
+.kv .arrow { color: var(--text-3); margin-inline: 0.4rem; }
+.more-cols { display: flex; align-items: center; gap: 0.4rem; inline-size: 100%; block-size: 2.25rem; padding-inline: 0.875rem; border: 0; border-block-start: 1px solid var(--line); background: none; font-size: var(--fs-md); color: var(--text-3); cursor: pointer; }
+.effect { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 0.875rem; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); font-size: var(--fs-base); }
+.effect .t { font-weight: 500; }
+.effect .s { color: var(--text-3); font-size: var(--fs-md); }
+
+/* ---------- Empty, loading and error states ---------- */
+/* One anatomy everywhere: icon tile, title, one or two sentences, then actions with shortcuts. */
+.state { padding: 2.5rem var(--pad); max-inline-size: 32rem; display: grid; gap: 0.5rem; justify-items: start; }
+.state.center { max-inline-size: 38rem; margin-inline: auto; justify-items: center; text-align: center; padding-block-start: 4rem; }
+.state.compact { padding: 1.5rem 1.25rem; }
+.state-ico { inline-size: 2.25rem; block-size: 2.25rem; border-radius: var(--r-lg); display: grid; place-items: center; background: var(--raised); border: 1px solid var(--line); color: var(--text-2); margin-block-end: 0.375rem; box-shadow: var(--shadow-sm); }
+.state-ico.danger { color: var(--danger); background: var(--danger-soft); border-color: transparent; box-shadow: none; }
+.state-ico.accent { color: var(--accent-text); background: var(--accent-soft); border-color: transparent; box-shadow: none; }
+.state h1, .state h3 { margin: 0; font-size: var(--fs-lg); font-weight: 600; letter-spacing: -0.008em; }
+.state p { margin: 0; color: var(--text-2); font-size: var(--fs-base); }
+.state .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-start: 0.75rem; }
+.state.center .actions { justify-content: center; }
+.state .why { display: flex; gap: 0.55rem; align-items: flex-start; margin-block-start: 0.5rem; padding: 0.65rem 0.8rem; border-radius: var(--r-lg); background: var(--sunken); border: 1px solid var(--line); font-size: var(--fs-md); color: var(--text-2); text-align: start; }
+.state .why .i { color: var(--text-3); margin-block-start: 0.15rem; }
+/* Preview of what will appear, drawn as faint placeholder rows (not a skeleton: nothing is loading). */
+.ghost { display: grid; gap: 0.5rem; inline-size: 100%; margin-block-start: 1rem; }
+.ghost-row { display: flex; align-items: center; gap: 0.6rem; block-size: 2.5rem; padding-inline: 0.875rem; border: 1px dashed var(--line-strong); border-radius: var(--r-lg); color: var(--text-3); font-size: var(--fs-md); }
+.ghost-row .bar { block-size: 0.5rem; border-radius: 999px; background: var(--line); }
+.steps { display: grid; gap: 0.25rem; margin: 0.75rem 0 0; padding: 0; list-style: none; inline-size: 100%; }
+.steps li { display: flex; align-items: center; gap: 0.7rem; min-block-size: var(--row-h); font-size: var(--fs-base); color: var(--text-2); }
+.steps li .kbd { margin-inline-start: auto; }
+
+.sk { border-radius: var(--r-sm); background: linear-gradient(90deg, var(--line) 25%, var(--sunken) 50%, var(--line) 75%); background-size: 200% 100%; animation: sk 1.4s ease-in-out infinite; }
+@keyframes sk { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.sk-line { block-size: 0.7rem; display: block; }
+.progress { block-size: 2px; background: var(--line); position: relative; overflow: hidden; flex: none; }
+.progress::after { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 35%; background: var(--accent); animation: prog 1.2s var(--ease) infinite; }
+@keyframes prog { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+
+/* ---------- Mobile ---------- */
+.mobile-switch, .mobile-only { display: none; }
+@media (max-width: 80rem) {
+  .workspace { grid-template-columns: var(--side-w, 14.5rem) minmax(0, 1fr) minmax(0, 1fr); }
+  .search-trigger { inline-size: 13rem; }
+}
+@media (max-width: 56rem) {
+  :root, [data-density] { --control-h: 2.75rem; --btn-sm-h: 2.75rem; --btn-xs-h: 2.75rem; --tab-h: 2.75rem; --row-h: 2.75rem; --pad: 1rem; --bar-h: auto; --topbar-h: 3.25rem; }
+  .workspace, .workspace.docs-mode { grid-template-columns: minmax(0, 1fr); }
+  .ctx-bar { padding-inline: 0.5rem; block-size: auto; min-block-size: var(--tab-h); }
+  .ctx-bar .crumbs { flex: 1; }
+  /* On a phone the trail keeps the page itself; the Back button names the parent. */
+  .ctx-bar .crumbs li:not(:last-child) { display: none; }
+  .ctx-bar .crumbs li + li::before { display: none; }
+  .aside-head { padding-inline: 1rem 0.5rem; block-size: auto; min-block-size: var(--tab-h); }
+  .pane-bar .bar-text > span { white-space: normal; }
+  /* Touch screens have no keyboard shortcuts to advertise. */
+  .pane-bar .kbd, .auth-notice .kbd, .ctx-bar .kbd { display: none; }
+  /* The sidebar opens as a drawer over the page from the menu button. */
+  .sidebar.is-drawer { display: flex !important; position: fixed; inset-block: 0; inset-inline-start: 0; inline-size: min(22rem, 88vw); z-index: 60; box-shadow: var(--shadow-pop); }
+  .drawer-scrim { position: fixed; inset: 0; z-index: 55; background: oklch(0.2 0.02 268 / 0.4); }
+  .auth-notice .an-actions .btn { min-block-size: 2.75rem; }
+  /* Three rows on mobile: top bar, the Request/Result switch, then the pane. */
+  .app { grid-template-rows: auto auto minmax(0, 1fr); }
+  .resp-head .spacer { display: none; }
+  .resp-head > .copy { order: 1; margin-inline-start: auto; }
+  .resp-head > .metric { order: 2; }
+  .tt-foot .ltr { display: none; }
+  .sidebar, .desktop-only { display: none !important; }
+  .mobile-only { display: inline-flex; }
+  .pane + .pane { border-inline-start: 0; }
+  .workspace[data-view="request"] .response, .workspace[data-view="result"] .request { display: none; }
+  .mobile-switch { display: flex; padding: 0.5rem 0.75rem; border-block-end: 1px solid var(--line); background: var(--panel); }
+  .mobile-switch .segmented { inline-size: 100%; }
+  .mobile-switch .segmented button { flex: 1; block-size: 2.5rem; font-size: var(--fs-base); }
+  .topbar { padding-inline: 0.375rem; gap: 0.25rem; }
+  .topbar .btn-icon { inline-size: 2.75rem; block-size: 2.75rem; }
+  .search-trigger { inline-size: 2.75rem; block-size: 2.75rem; justify-content: center; padding: 0; background: none; border: 0; }
+  .search-trigger .grow, .search-trigger .kbd, .persona .name, .persona .role, .persona > svg, .api-switch .ver, .api-switch > svg, .topbar .spacer { display: none; }
+  .persona { padding: 0 0.5rem; block-size: 2.75rem; border: 0; background: none; }
+  .topbar .brand { display: none; }
+  .api-switch { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; display: block; line-height: 2.75rem; block-size: 2.75rem; font-size: var(--fs-md); }
+  .kv { grid-template-columns: 7rem minmax(0, 1fr); }
+  .kv .v { white-space: normal; overflow-wrap: anywhere; }
+  .op-head { padding-block-start: 1rem; }
+  .fields { grid-template-columns: minmax(0, 1fr); }
+  :is(.fields, .param-holder > div) > .field:is(.half, .row-start), .param-holder[data-half] > div > .field { grid-column: 1 / -1; }
+  .assist { block-size: auto; min-block-size: var(--assist-h); }
+  .assist > .msg { white-space: normal; }
+  .label { flex-wrap: wrap; row-gap: 0.125rem; }
+  .label .end { gap: 0.375rem; }
+  /* Clear keeps a 44 px hit area without growing the label row. */
+  .field-clear { block-size: 2.75rem; margin-block: -0.625rem; padding-inline: 0.625rem; margin-inline-end: -0.625rem; }
+  /* Radio options grow to fill the row on a phone. */
+  .rg-opt { flex: 1 1 auto; }
+  .sel-trigger { inline-size: 2.75rem; }
+  .tabs { overflow-x: auto; scrollbar-width: none; padding-inline: 0.25rem; }
+  /* Tabs that don't fit scroll; the fade says there are more. Nothing is ever hidden. */
+  .tabs.scrolls { mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent); }
+  [dir="rtl"] .tabs.scrolls { mask-image: linear-gradient(to left, #000 calc(100% - 2.5rem), transparent); }
+  .op-crumbs .view-switch { margin-inline-start: auto; }
+  /* The Form/JSON switch drops to its own line rather than pushing off-screen or breaking a word. */
+  .section-label > .rule { display: none; }
+  .section-label { flex-wrap: wrap; row-gap: 0.5rem; }
+  .section-label > span:first-child { flex: 1 1 auto; }
+  .section-label > .segmented { flex: none; margin-inline-start: auto; }
+  .tabs .end { display: none; }
+  .pane-bar, .actionbar { block-size: auto; min-block-size: 3.75rem; padding: 0.625rem 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
+  .actionbar .status { flex-basis: 100%; white-space: normal; }
+  .actionbar .btn-run { flex: 1; inline-size: auto; justify-content: center; }
+  .actionbar .btn-run .kbd { display: none; }
+  .pop { inset-inline: 0.75rem !important; inline-size: auto !important; }
+  .info-btn { inline-size: 2rem; block-size: 2rem; margin-block: -0.25rem; }
+  .info-btn::after { content: ""; position: absolute; inset: -0.375rem; }
+  .info-btn { position: relative; }
+  .kv-row { grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem; grid-template-rows: auto auto; }
+  .kv-row > .c.name-c { grid-column: 2; padding-block-start: 0.6rem; }
+  .kv-row > .c.val-c { grid-column: 2; grid-row: 2; border-inline-start: 0; padding-block: 0.2rem 0.6rem; }
+  .kv-row > .c.check { grid-row: 1 / 3; }
+  .kv-row > .c.acts { grid-column: 3; grid-row: 1 / 3; border-inline-start: 0; }
+  .kv-row.head { display: none; }
+  .resp-head { padding-inline: 1rem 0.5rem; flex-wrap: wrap; block-size: auto; min-block-size: calc(var(--tab-h) + 1px); row-gap: 0.25rem; padding-block: 0.4rem; }
+  .state { padding: 1.75rem 1rem; }
+}
+/* A carried or remembered lookup value waits for its record in the record's shape. */
+.lk .picked .sk-box { inline-size: 1.5rem; block-size: 1.5rem; flex: none; }
+.lk .picked .sk-line { block-size: 0.7rem; }

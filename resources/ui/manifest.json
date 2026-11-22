@@ -1,0 +1,866 @@
+{
+  "version": "0.1.0-alpha.1",
+  "bundleHash": "339a2aef4103589d37b3647b91c15ecc97289163beed31142147a4c1d095cafb",
+  "files": {
+    "action-bar.js": {
+      "sha256": "602e4e63ef32722957a0e7706b9d7f681842efe1642fbe99c20744e72c164016",
+      "bytes": 6860,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "api.js": {
+      "sha256": "11c0271721183bfe2f399468fda5fab48d1fb8c61fcf109cd3ceec2f279a79b1",
+      "bytes": 10927,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "app.css": {
+      "sha256": "559a559e0ac220592a1051dfccfcce3b0388d4ba4d161fb5b4a652c58b7dbab6",
+      "bytes": 70339,
+      "contentType": "text/css; charset=utf-8"
+    },
+    "app.js": {
+      "sha256": "eb3c7d0fcaa1464382fdbf4b45ed7bc2d99c6c92e0f2a8d7918836a8ffb3232a",
+      "bytes": 35671,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "autofill.js": {
+      "sha256": "769c7d2ca45fa42fce27942a7cff03c079346fe9c2496bdffcdc5ccde50339ba",
+      "bytes": 7093,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "code-copy.js": {
+      "sha256": "cf36f841f988696f8d41cc773e7e9804a3f315fdc85033e4d71c424ab43b86e5",
+      "bytes": 3610,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "code-picker.js": {
+      "sha256": "3126d17bc39046bd51d9ae4aa04700af6fcb43db8115b7462b6b9eb63173cea0",
+      "bytes": 7750,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "commands.js": {
+      "sha256": "3be7e2629f2faee496548c417299ca97aabe26062aacd9196321cfbea9e38159",
+      "bytes": 9468,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "components.js": {
+      "sha256": "4f50ad8a95a171e4f7a932d85d6caa725991d588ab452b4014e3d74fcd74aafa",
+      "bytes": 6257,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "context-bar.js": {
+      "sha256": "bb72903e8dbecbe4219675f6f226f33cb8b5fdb199dbe899092ebd590ce1b068",
+      "bytes": 4947,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "copy.js": {
+      "sha256": "7afb7f0a46ab72d78d6b47eac911fe2601c4f2e84d59f0d03d7d063b0977ec2f",
+      "bytes": 3708,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "coverage-popover.js": {
+      "sha256": "7cb4a0e879034602eaf67beeeb690d7b2a96cc5a955a818abf8adc17a1f219e4",
+      "bytes": 2295,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "crumb-fit.js": {
+      "sha256": "dd4213d82cc6620f0b4987f33cba0adaeaf380689033df40bdc27ab497575b3d",
+      "bytes": 4378,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "deprecation.js": {
+      "sha256": "723cba27d2b977f4e3d9a8b0e4083348dd03bf5cf4d41eec9d195780a6e385b9",
+      "bytes": 10334,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "display-settings.js": {
+      "sha256": "7e1dd404115b88384fc3ce7dbca555066620a7764e1bed3c0ddcacf2fc451756",
+      "bytes": 11036,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "doc-diff.js": {
+      "sha256": "fa5870ad80397e0d0ca721daed65a66b3775d1591a0a6ec3a2ba45093ffaa63b",
+      "bytes": 13543,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "docs-view.js": {
+      "sha256": "08f7cb5e961bde25b732d2f79f4876f61eed990f56e97d7de1f45d29ec1168c1",
+      "bytes": 24257,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "favicon.png": {
+      "sha256": "fb1806b2e1b58fcdd2285e3acdc9e1a861198e573773f62dcb422fae60f1771d",
+      "bytes": 701,
+      "contentType": "image/png"
+    },
+    "favicon.svg": {
+      "sha256": "a1ec7773b611e6c4e800abf45e7f347e43ec4c632958c8f0b90e8937ccecc451",
+      "bytes": 370,
+      "contentType": "image/svg+xml"
+    },
+    "field-help.js": {
+      "sha256": "d04699b9b2cc37119c1e30666f3725f15e813acab745e28f39c037397dd6d729",
+      "bytes": 4193,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "field-modules.js": {
+      "sha256": "ad035b04fa5e19a502423af502253b2682b8e806745bb437538f3048225da67a",
+      "bytes": 1008,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/controls.js": {
+      "sha256": "8662405547eb87dd77cd1ce52249ea14dadf40e9ce283163a81145c031552bc9",
+      "bytes": 10430,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/dom.js": {
+      "sha256": "8a81a0e0b6bed6ed2888a999154f3135c4431934f4dcbdbfaa73cb73ae35d5f4",
+      "bytes": 1844,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/infer.js": {
+      "sha256": "b8333ebc5edc07068d8669187aa4edd5e13d3da725dca6ec5911eab99afbeb14",
+      "bytes": 4413,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/lookup-source.js": {
+      "sha256": "0d0d9d174c14f2862c549222639e015a5232ffcc085300ec935d4450c462d486",
+      "bytes": 3139,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/lookup.js": {
+      "sha256": "58f6eaf1f48708896cdb67aae928a2d3d0fe5c9eb5a56314891a5e56800af369",
+      "bytes": 17031,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/render.js": {
+      "sha256": "0a3a1361eb251d1c25ff67ad302918a7ea4985ed70efbf376b6802a4f6dc84d0",
+      "bytes": 26237,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/select.js": {
+      "sha256": "37558db215842505df36c0396f2edc1a6ccee0b41b8bc33451fa5536a8a29fbf",
+      "bytes": 9097,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/validate.js": {
+      "sha256": "86889410e1f7b11c7a95cabea1e82aa8c89e0143c8415a44fc5cfa10db26094c",
+      "bytes": 16644,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/validation-formats.js": {
+      "sha256": "c4e8eb8946ad0b2b91d2352ef16b683b1a357076f8e66e2fcbe2e7b39cfa6ceb",
+      "bytes": 7148,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/validation-references.js": {
+      "sha256": "340ff01927ae28bf09ae145bf9acfb4f39fb60269f0711af203079b27dab1f97",
+      "bytes": 2413,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "fields/validation-values.js": {
+      "sha256": "c2356a64c917417ab92da15bb670e2cd86e6b2ae04fffb71d2d1ce4fa512228b",
+      "bytes": 6659,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "generate-menu.js": {
+      "sha256": "f6c5b0e01aed41b3e70f3f87e14d263dd6e1fc536036b701baf65687c4cb663f",
+      "bytes": 3039,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "generate.js": {
+      "sha256": "a8a4a2ff4a13ac4bb2f5a97b0ee34e0e207d5d98354033067d49dbd74b0f0b26",
+      "bytes": 11584,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "header-editor.js": {
+      "sha256": "0473c7e777aa39dcc752d056aa9b47a840acd71f4e6ee4e0a3a80d79e298e024",
+      "bytes": 35882,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "headers.js": {
+      "sha256": "ee43cd50b085cd7440ab1e85cc4cc836e6e2064f3e3b9998bf6004eb602041c9",
+      "bytes": 6915,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "highlight.js": {
+      "sha256": "42f897de4080ace519b86403a79c00e461c6c2f9505d2332d2ea5698504d83b8",
+      "bytes": 13584,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "history-popover.js": {
+      "sha256": "9bd9958ec54cce75f572ea37c9543bb544c419e5487a34c72de19d7835d945fd",
+      "bytes": 1793,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "i18n.js": {
+      "sha256": "c66c03351325a07773decc934d8e35a3ce2376f10fb827cade8883a66e143be6",
+      "bytes": 16164,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "icons.js": {
+      "sha256": "47f62c105a85e4382ac04f38f0a72aebe1efeaf7b68552483d91e8c69c0fa1ca",
+      "bytes": 8188,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "index.html": {
+      "sha256": "7f1b211e71bd6899dbad9f2be4b28235beb9892ead9c544d936af8a78b586539",
+      "bytes": 6889,
+      "contentType": "text/html; charset=utf-8"
+    },
+    "issues.js": {
+      "sha256": "01363ae1af0c40a603188d36e23f8907e59315f47923aadf1ffdf9ff2443250e",
+      "bytes": 8993,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "json-view.js": {
+      "sha256": "34beba6d786bae73ff104211c4c65085a625a60498ec54a162519feb74b28a50",
+      "bytes": 9172,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "lang-icons.js": {
+      "sha256": "e074efd5f678f4f54e7179fd3af91307513d424e9f72aec3b1a3b743947f9373",
+      "bytes": 14824,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "layout.js": {
+      "sha256": "5744c0514ee08c83b79f31cc0a3100ecb726f623529880cbb933826b65158dc5",
+      "bytes": 9907,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "listbox.js": {
+      "sha256": "fd5b24c9de8d9af19693b6b0d7701f534d6ed4a17e52a9384cfb3f046f568940",
+      "bytes": 18446,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ar-capture.js": {
+      "sha256": "c3726d26e9bb1d4e53823c6c3ed6b8cb8286c4bd69d4b6192205a60a6f3dffac",
+      "bytes": 25944,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ar-stores.js": {
+      "sha256": "cac6920e5156683132bd90eac85d48aa188fe054df92abd9e036e8387e67994a",
+      "bytes": 10080,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ar.js": {
+      "sha256": "6d906ca82f02f3c288a068c9d3c460efb83fa194663f36660304eb4a4c419d66",
+      "bytes": 63418,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/cs-capture.js": {
+      "sha256": "4d892ba46ec3f10c31da73298131e24f6250e94ad7f552047ab04d5deb16a389",
+      "bytes": 20664,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/cs-stores.js": {
+      "sha256": "ba78b79952d1473fda94727603298a1748299b276822e0cd9c80646792fef1f7",
+      "bytes": 7588,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/cs.js": {
+      "sha256": "7d9f02ea17a7d141da752b9056981fab33eb1d794e34d5f4d442acbb10749b5d",
+      "bytes": 51673,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/da-capture.js": {
+      "sha256": "77ae21564dd8f0a0e94458f6ce5e7db06b5c48f89f8b1d06788dca45ec4d46ac",
+      "bytes": 17096,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/da-stores.js": {
+      "sha256": "e48d898f1fc6121bae89d1f28a621d230fc847e3c8cf71e2f90f9159b22a5931",
+      "bytes": 7088,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/da.js": {
+      "sha256": "8a7a720579789a309ac97e9d7d534c940ca89bdf8f11849ea06b96e155b5fde2",
+      "bytes": 45395,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/de-capture.js": {
+      "sha256": "dce9c7c371862d09c5da2b1fe01d83c48d39f4581f646142971ff124158ea903",
+      "bytes": 18537,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/de-stores.js": {
+      "sha256": "cbd5bf7555542fceddba96ebf53e46d434cd2dc2f4c185a56747715f9e7d1eac",
+      "bytes": 7367,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/de.js": {
+      "sha256": "097fd7386ab7f930559a35e57217c466471ebfb066443a0e903d884939c6b823",
+      "bytes": 47819,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/el-capture.js": {
+      "sha256": "f415b2ede463e9b70e12ae64ce3c2147dae1883af20aaefc0e4e230d43918fcb",
+      "bytes": 25491,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/el-stores.js": {
+      "sha256": "26b80db1c4c012eaf264b8dee117517d25cf67e4d80643ee28401234e3c96b24",
+      "bytes": 10431,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/el.js": {
+      "sha256": "167cb0d798322b4b9d33af6ffc7e8ad6df1cf5494314fa6abbe47a4989de8566",
+      "bytes": 69013,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/en-capture.js": {
+      "sha256": "0e0fdba4cf0d8ac8600cc7814a5b9f0c59821c0979730f961172bb2e8c331e6e",
+      "bytes": 16577,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/en-stores.js": {
+      "sha256": "7a1cd81464d71e87e065df4d79cfb464f39619254d01144f854154a5174a2bce",
+      "bytes": 7062,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/en.js": {
+      "sha256": "048db3ed410f32047de72d762f463886e3b44398338e19c24dc19cc9204edbb2",
+      "bytes": 43395,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/es-capture.js": {
+      "sha256": "0c5b2c1aba8e6722055118aa4b93450811a0cd7b57f7fec2e4cb08c2f16c683d",
+      "bytes": 18199,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/es-stores.js": {
+      "sha256": "f9cf6334a5c2ae66d88ae093f694bac822afe1a918b18089cfc9b61e348723c7",
+      "bytes": 7558,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/es.js": {
+      "sha256": "2551495069c386290ef7c85c2650c4ed1b5ed913d9b4c22ecdac6caace266fc7",
+      "bytes": 47863,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/fa-capture.js": {
+      "sha256": "4ecbfedcd75da7bc646dda3789afa0d1422e79293c2c3706e02a2771c6b2637e",
+      "bytes": 22371,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/fa-stores.js": {
+      "sha256": "69f6b2501bfef88f8e545e14bd4baa690358fe202e1dcb9cdd29fe2e9bc88445",
+      "bytes": 9067,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/fa.js": {
+      "sha256": "ffb528ae9c0107e9e5c27a3b389bfd801a247f660cc6ee4589fa8def902b2edd",
+      "bytes": 60400,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/fi-capture.js": {
+      "sha256": "90172378b763521af1d5d3883e1e4661d952cbb6f91df99f80f4a7588eca8e46",
+      "bytes": 17851,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/fi-stores.js": {
+      "sha256": "9704b4cd6f9fcdaa3a90fbec202fa78ce57e7814f473eddf206cd450f70bdfee",
+      "bytes": 7344,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/fi.js": {
+      "sha256": "5199a66a3f36491ba41ee500293a1ddf8dd7f2919300ce55c99a627a28fa0b5d",
+      "bytes": 47853,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/fr-capture.js": {
+      "sha256": "66017ae6a030853db0b9e69c75d2935fae2bd29260ffdd3f7e92292ec06dd6bd",
+      "bytes": 18626,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/fr-stores.js": {
+      "sha256": "597a62b2c066398521c2f16a6090e582a6b8813037260cc29e2b798ff6a124a6",
+      "bytes": 7788,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/fr.js": {
+      "sha256": "7b68d5ec0897d6a8ec76734fe5c48e9164cc5095d3dd4d5e4b6967b81a3c1904",
+      "bytes": 49407,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/he-capture.js": {
+      "sha256": "6c59addd063f9d36e9452e313324c48aa3fefe2262d37ff2e5becbc03cef3686",
+      "bytes": 21373,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/he-stores.js": {
+      "sha256": "56f835767425fe672f3c019b6ec89ddefc34c9f507563c6473c1185d011761c7",
+      "bytes": 8603,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/he.js": {
+      "sha256": "fb33dfe160d6a43c6b44384f98b39feca6584d7a66bb3fb9e8814aa8567c4807",
+      "bytes": 55120,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/hi-capture.js": {
+      "sha256": "e312badb903066e35b697f50ceb7e6a1bc53890ffa5ae2419a3d6fc5e82f0199",
+      "bytes": 27166,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/hi-stores.js": {
+      "sha256": "6184ea3cbe8e34bdf30f77ccb1580d75b8f31d03fce0b64bc8be6a3912869f80",
+      "bytes": 11537,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/hi.js": {
+      "sha256": "2ecc9f59949b6899a6d477609f72ac160883c6445a620ce9a7381f554323e60c",
+      "bytes": 77067,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/id-capture.js": {
+      "sha256": "33baa79c66023ee3a37f2ef2957f9032c21a228b167aaac58f3dfc8c59425416",
+      "bytes": 16401,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/id-stores.js": {
+      "sha256": "cf695fd38ceb5facb8bbcb066214c3634cf5c7c4db25548a936ea4010f5312c0",
+      "bytes": 6741,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/id.js": {
+      "sha256": "b0a5a36c389e3b453fbb5c3582969a39bce9b338fee50957544b109546c913ab",
+      "bytes": 44226,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/it-capture.js": {
+      "sha256": "d911f236478bf27118f8624492a949538e5e5131f795f5adfb9d7e616dc5448e",
+      "bytes": 18101,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/it-stores.js": {
+      "sha256": "52b4d30dcece4764dc3ac43e545334374aaa671dbdae308f6be026c5318ba91a",
+      "bytes": 7539,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/it.js": {
+      "sha256": "8de0197acdbc52372820c572bb7014d9fd189875ef09901a27f622b03b226568",
+      "bytes": 46996,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ja-capture.js": {
+      "sha256": "9ea26f59df007c34d60136d5c18ed83ff11b4ad6539026e39deba61ee043a18b",
+      "bytes": 19640,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ja-stores.js": {
+      "sha256": "96a2d12b493b1dd67bc1f54fcb181ec99a92832796144ae2835297c138024974",
+      "bytes": 7866,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ja.js": {
+      "sha256": "6fa213c16819169acbd2edfbfcec0ddb9317780461c5f56286db6d3e1ce029a2",
+      "bytes": 53367,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ko-capture.js": {
+      "sha256": "66789398debe6347d690f84128af7f26d2115d304dbd07ae1f877cf828e51a5c",
+      "bytes": 17670,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ko-stores.js": {
+      "sha256": "753abf654e778c5db042d710da1666b1e191fbc6499b803abadc370d3d991558",
+      "bytes": 7096,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ko.js": {
+      "sha256": "711b837a484648391b1ae99b873d809dc89e3bac816e76fd4694821c68d5b8b5",
+      "bytes": 47819,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/nb-capture.js": {
+      "sha256": "19052e7a88f7c7d5e79dbad286f3eecc48653f00df837d34c6d97795aeeda060",
+      "bytes": 17769,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/nb-stores.js": {
+      "sha256": "521c7aa7cfcdfdae0f8f13b8cd9edd796ab8b3d5d7f3f6904dd24f8d94f49938",
+      "bytes": 6999,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/nb.js": {
+      "sha256": "ef7d1ff90514a13cd19a8a12c177a654f939e09aef45fe910ac2be4a8fe08e61",
+      "bytes": 46138,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/nl-capture.js": {
+      "sha256": "0d1a0fb343312526535562a1c131a880752aed837e96c3fbfd5af196400358e4",
+      "bytes": 17594,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/nl-stores.js": {
+      "sha256": "beb04dea0d767b6f08ad31d610d2a28951fbdfba9a500048c993d17721a0067b",
+      "bytes": 7085,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/nl.js": {
+      "sha256": "7757682fc52ed2c162e7150830557cc01c2eb4812725a472ccc983ee4c4b9ced",
+      "bytes": 47084,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/pl-capture.js": {
+      "sha256": "5b6c916d83687cd927cf840c4e538bda5d8079a0daaf9b199f1d2e22337fd902",
+      "bytes": 20394,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/pl-stores.js": {
+      "sha256": "71ed1c277e12b0c92a115cbd99337e913324ff09065b84ff13aa1253bea7899e",
+      "bytes": 7644,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/pl.js": {
+      "sha256": "09a50985aa887f94a21f439073b45d29ed8bca8c7aebe56c42cabcec4271ef87",
+      "bytes": 50622,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/pt-BR-capture.js": {
+      "sha256": "9427ccbe048007d5efe961f6f946998cfab019d7547a01ec385140f8081bbaa8",
+      "bytes": 17677,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/pt-BR-stores.js": {
+      "sha256": "b406fe25ca2f77765204e307f7c3be23aff5a1c3b7588b7a94fe0cddf33f4d28",
+      "bytes": 7711,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/pt-BR.js": {
+      "sha256": "5857249f3d596535dfc5e10c7311aac74cb1161b36c938633b2ceedfa215c3a3",
+      "bytes": 46785,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/pt-PT-capture.js": {
+      "sha256": "7684abde1a1fcc0513b9a81aab3251b012d28ef9333b46405a05289a6b962e1b",
+      "bytes": 18021,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/pt-PT-stores.js": {
+      "sha256": "9fba1027bc0fe0d3f56a9babd5d453fa1faa53cfd1cbcb1097be5d7a96f50fad",
+      "bytes": 7656,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/pt-PT.js": {
+      "sha256": "c74354a12fd6e7bdc8056611962a4678f1ceeaab8a7f98b4b285294f73ebb07a",
+      "bytes": 47539,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ru-capture.js": {
+      "sha256": "1ae41634f4a09da0ada4665a6e9048816d42afe5e0f640816f2a983680dd4d9f",
+      "bytes": 27354,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ru-stores.js": {
+      "sha256": "85b9e4ebfabdaf4b71848e9a61b45b7fbbdef7de5ea43bd14661031c4f63de0a",
+      "bytes": 10882,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/ru.js": {
+      "sha256": "d31e30d8848709e60c441d062ea37b19cfffa8538c85dbd1c92aabf46c348491",
+      "bytes": 69486,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/sv-capture.js": {
+      "sha256": "a7cdec1711138dbb598a5f1a952ff91a299f86f0afd80c350053a5620cbc7cf5",
+      "bytes": 17774,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/sv-stores.js": {
+      "sha256": "3f56221e94d78afbc710a1ac7206a110a9bc9444bdb76bcb9d39ecea772f1520",
+      "bytes": 7089,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/sv.js": {
+      "sha256": "e4e33ab9118f35ef76db8f62881b21b2f867d96033d816f849b6b46d92aa122c",
+      "bytes": 47065,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/th-capture.js": {
+      "sha256": "aa648304d06925eb52d5296a8919edb9d062e3b4b3f544ce621b86d51dc2ccb5",
+      "bytes": 24599,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/th-stores.js": {
+      "sha256": "cc385afa0086af059202fd74d3b9ba6eac7e8e18a891910bf7e45191ab316e94",
+      "bytes": 10670,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/th.js": {
+      "sha256": "38e822d4b5c3b87e470da43351103d4389be6ec4cbf99e6ecc773457537f6634",
+      "bytes": 71393,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/tr-capture.js": {
+      "sha256": "0b62038ea895fc1b31f5123a78348e2df04949a6e6a1d4cc58f5cbb79d143ecb",
+      "bytes": 17921,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/tr-stores.js": {
+      "sha256": "4031328ef354abd01714d07fba6640363bf3a24bf1d0bd2b81d187c89d878359",
+      "bytes": 7182,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/tr.js": {
+      "sha256": "106dde54289a17b39bc3f6e28a0fce4deacd6390fbffcb9f958c46145ca1cdce",
+      "bytes": 47428,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/uk-capture.js": {
+      "sha256": "f5c499ad6fce3ecaaaad727b0d6a8e1eb92217cedc09b8ec40ecf68e4b046b7c",
+      "bytes": 27751,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/uk-stores.js": {
+      "sha256": "c921f6227b142279771df5584dd7086669c6aa1a5439f2142378fb7d2b7adae3",
+      "bytes": 10750,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/uk.js": {
+      "sha256": "4c4d2f2f7582fac5aca434d1cef281b26c0997793846f9f73aa801f21ba193c6",
+      "bytes": 68877,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/vi-capture.js": {
+      "sha256": "a6cdbf98b811a3cc39a659b627bc77305b02db3f44438f5816ff4ec73edf2bf9",
+      "bytes": 17814,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/vi-stores.js": {
+      "sha256": "9a815e7204a430185fda2e77fae65d57927be711dca67b898617b0e2da6cb9d3",
+      "bytes": 7263,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/vi.js": {
+      "sha256": "a554d23f958f86624747f102ed415963b17cb50a6dd3bec802df41288f088ccf",
+      "bytes": 49565,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/zh-Hans-capture.js": {
+      "sha256": "4a17f5613012fab180dedc992a77b6f8d55d2ea94d7bda1671e16786b74fea91",
+      "bytes": 15921,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/zh-Hans-stores.js": {
+      "sha256": "920ad4fb6b7dc734220c1dd6f111a46d55f8ef233423e4d8d2d1d1db827c6774",
+      "bytes": 6201,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/zh-Hans.js": {
+      "sha256": "caac2e5e1e3a984a925c25c457f1bb51df17d49ee45d6ea013ee6d483b90ca74",
+      "bytes": 42348,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/zh-Hant-capture.js": {
+      "sha256": "4d63071a7523c015b6f3cf9bcdd5391a93486e1ffeec62f358b53a752e5bdd73",
+      "bytes": 15961,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/zh-Hant-stores.js": {
+      "sha256": "009609b38fcc24ed9f12b18a86a22c1afef48550880832e262d86efde5bad9f7",
+      "bytes": 6211,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "locales/zh-Hant.js": {
+      "sha256": "38c9632f8706f3204eba59d366ecd5e30d1a8732ae795b8b39e5776f8b5e9efe",
+      "bytes": 42684,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "markdown.js": {
+      "sha256": "fce8b4255acfb4d6f8687d7dc9f2f5c69883f2131041ee1c7ed1cc258779807a",
+      "bytes": 2264,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "model-view.js": {
+      "sha256": "827473f45e314cc5a84051c836e63b9a1d7c482b5d57c2592f79ed5ba5a10bd1",
+      "bytes": 14567,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "navigation.js": {
+      "sha256": "5fc80117f7ee79991ce24d9b2a1965905865981e33e40617a1c0c93de07ebe08",
+      "bytes": 9283,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "operation-header.js": {
+      "sha256": "682f852811c69df896cbc542e3240dabb220a86b00977d572b1ff0bd25db4741",
+      "bytes": 4935,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "operations.js": {
+      "sha256": "fcf18f6d77fe3a2f3dd382399e9f7828d537dd3a9e84fcbe0200b965ccf5b817",
+      "bytes": 362,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "overview-view.js": {
+      "sha256": "3d2f53cd74fb62adfd79df5cb10c6dfd9d6144f5fb37fb4562e7f41e58f398fe",
+      "bytes": 5454,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "personas.js": {
+      "sha256": "1f2a7f1fe6c72c8ad6a6c95e2fedec19fde3bb035ee2fddb82cfb5132a1323e5",
+      "bytes": 3003,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "popover.js": {
+      "sha256": "88104b64cf7b8d5461f5a0e1474dfa8f5f6de03659f69127ddb9245b6d6f54f7",
+      "bytes": 3421,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "preview-false.js": {
+      "sha256": "c630f88a90d734e45d75587861bb461b88f4f60250fa548abc3178644127af59",
+      "bytes": 5896,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "request-editor.js": {
+      "sha256": "1208f3c7e3cd5b40e4811dc2df72743949fb4d1db89f11def4e3f77980d5c3bb",
+      "bytes": 31082,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "response-metadata.js": {
+      "sha256": "92024deb4392e4d73a00f86bbfd99a4e1565df54122712f89be2e6fd2676cafe",
+      "bytes": 17534,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "response-viewer.js": {
+      "sha256": "020a9bfffd22c91479ba3767be5d67c08a62750234c57444f5dcd4442f10b0e2",
+      "bytes": 36351,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "result-blocked.js": {
+      "sha256": "4a7ed33a0904f920819f536a489670d1dc7968e15b48892865e46be1493ff207",
+      "bytes": 11526,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "result-capture.js": {
+      "sha256": "39efb33f2900aecdb6532edc9c7b41818dc8f333c8a4da8312c698df4d87c2c4",
+      "bytes": 1103,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "result-database.js": {
+      "sha256": "3b101cc9c72a763f32256febc415c003849b5d1eb7d5beed42904d1f2ceaad04",
+      "bytes": 12180,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "result-effects.js": {
+      "sha256": "33a2ab421393d91b35b0eab29c1a6e2d61f7e6ae17e2805ba5b25af00734dc55",
+      "bytes": 10104,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "result-headers.js": {
+      "sha256": "90521cc9f2ad777589e17ee70439bdba349f12b8cd06675923afea8662b039b1",
+      "bytes": 5387,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "result-logs.js": {
+      "sha256": "21a2d95f34390c992e81cfaf419aa6e5062f25687acdc7225940fa68877ac8d2",
+      "bytes": 24654,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "result-states.js": {
+      "sha256": "f4628af13af9b38a2312dca2d6d3d2a05262721c1b88af828554b1cab35f4d35",
+      "bytes": 17018,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "results.js": {
+      "sha256": "40eb59eb5a76910be77cd823e1c319c6ac4dc4eb691d9c5d47fcb0d81ff959a4",
+      "bytes": 18918,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "router.js": {
+      "sha256": "0b6b5aaaed1c14e3bf7db68f3bef145c1675e470bcf437afeb50dc0a73a30780",
+      "bytes": 5815,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "schema-model.js": {
+      "sha256": "6fdf236dd00b08362a38d8b203fa245257786df8a01287ed791aa6f1e7428246",
+      "bytes": 17481,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "schema-tree.js": {
+      "sha256": "202a6f4241af8019eb795722610b33f217e60661501a2f4d435f2ad4fad836bf",
+      "bytes": 21067,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "schema.js": {
+      "sha256": "6d99783d270d3b01c621b38b8ec31d113fc96acad7876a737826c9bec4cc56ac",
+      "bytes": 18154,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "security.js": {
+      "sha256": "4c1264c127b012fb8dabaf7884292e8a8bf01babcf89be1b88c0fb0895ad6604",
+      "bytes": 1699,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "seeded-menu.js": {
+      "sha256": "2789f8b07e990bd80da55b760050518b31d4197e569449f6d0bab1fd82ba6bc1",
+      "bytes": 4169,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "settings.js": {
+      "sha256": "4c07b3957666f3c492fbd58d451ed4c80dcfa47415eb440943a1cf2316c1fd8e",
+      "bytes": 4530,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "shortcuts-sheet.js": {
+      "sha256": "5c2156c4fae36cac9429f27156a7b32807fd294f3226ccd911637c0dc48abe5d",
+      "bytes": 4427,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "shortcuts.js": {
+      "sha256": "44c920d585dd18e31d48a0512267cab81f4288f5b20fb006a2218460b213c9ca",
+      "bytes": 10187,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "sidebar.js": {
+      "sha256": "6674c8175a0581abfb13b4187ca36d6180f3251babd1f8bfee8ba219721ca4c4",
+      "bytes": 17067,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "signin.js": {
+      "sha256": "94fa0e7ef58bc4c1449faa7b9533c8203674499a92ce3f11ab579027c3bbb8de",
+      "bytes": 16508,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "snippets.js": {
+      "sha256": "e254c9a02ac579d0e401accd06f62825ae97397b55db07dc7439d3a24bb26014",
+      "bytes": 30663,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "store-marks.js": {
+      "sha256": "acef7b206ca197179d9cea3cfc3b39ddf91555cc41f58108b5584f02600575f1",
+      "bytes": 22864,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "stores.js": {
+      "sha256": "d4fed6d031dd105e3b923984d4f8c25ec2b38a7ea32e8765fb7e9fa80eaf9f29",
+      "bytes": 6858,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "styles.css": {
+      "sha256": "e0aaebb81947ecff61149236201408d996eb63766c8637ca61a1d0b725e2880f",
+      "bytes": 75276,
+      "contentType": "text/css; charset=utf-8"
+    },
+    "toggletip.js": {
+      "sha256": "d4ab7a847876a10c25e8b7bd533bdeaadc987e79ee9a882b7dc2011bae172d1c",
+      "bytes": 2284,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "uuid.js": {
+      "sha256": "56c8eea45c3c4400cfd80544ae4f5aff7d99e450b9fc5ffb1d259fde63f7ba80",
+      "bytes": 588,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "view.js": {
+      "sha256": "466a2c6ecb310d8b025eeb5129b461e5924c0c564f33de72dcaf8371e5083346",
+      "bytes": 7960,
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    "views.css": {
+      "sha256": "c80282d79c220faaa5ef947acf43ebd4f5610b833bb1a2945375028d72b1a718",
+      "bytes": 57094,
+      "contentType": "text/css; charset=utf-8"
+    }
+  }
+}

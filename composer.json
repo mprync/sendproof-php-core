@@ -1,0 +1,66 @@
+{
+  "name": "sendproof/core",
+  "description": "Framework-neutral Sendproof protocol core for PHP: preview, observed send, capture and embedded workbench assets.",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "sendproof",
+    "openapi",
+    "api",
+    "preview",
+    "rollback",
+    "api-testing",
+    "workbench",
+    "swagger"
+  ],
+  "homepage": "https://github.com/mprync/sendproof",
+  "authors": [
+    {
+      "name": "Sendproof contributors",
+      "homepage": "https://github.com/mprync/sendproof"
+    }
+  ],
+  "support": {
+    "source": "https://github.com/mprync/sendproof",
+    "issues": "https://github.com/mprync/sendproof/issues"
+  },
+  "require": {
+    "php": "^8.2",
+    "ext-json": "*",
+    "ext-mbstring": "*"
+  },
+  "suggest": {
+    "mongodb/mongodb": "Guarded MongoDB client and Preview transactions (needs ext-mongodb)",
+    "predis/predis": "Write guard for Predis Redis clients",
+    "aws/aws-sdk-php": "Write guard for DynamoDB clients",
+    "elasticsearch/elasticsearch": "Write guard for Elasticsearch 8 and 9 clients",
+    "opensearch-project/opensearch-php": "Write guard for OpenSearch 2 clients (PSR-18 and legacy transports)",
+    "google/cloud-firestore": "Write guard for Firestore clients (needs ext-grpc)"
+  },
+  "autoload": {
+    "psr-4": {
+      "Sendproof\\Core\\": "src/"
+    }
+  },
+  "archive": {
+    "exclude": [
+      "/vendor",
+      "/tests",
+      "/compat",
+      "/phpunit.xml",
+      "/.phpunit.result.cache",
+      "/.phpunit.cache",
+      "/composer.lock"
+    ]
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "php-http/discovery": true
+    },
+    "platform": {
+      "ext-grpc": "1.60.0"
+    }
+  },
+  "minimum-stability": "stable"
+}

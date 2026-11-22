@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Sendproof</title>
+    <link rel="icon" href="favicon.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="views.css" />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <!-- The loading shell mirrors the final layout (mock 39), so nothing jumps when the spec arrives. -->
+    <div id="app">
+      <div class="app loading-shell" aria-busy="true">
+        <header class="topbar">
+          <span class="brand"><span class="brand-mark" aria-hidden="true"><svg class="i" aria-hidden="true"><use href="#i-mark"/></svg></span><span class="desktop-only" data-i18n="app.name">Sendproof</span></span>
+          <span class="crumb-sep desktop-only" aria-hidden="true">/</span>
+          <span class="api-switch faint" role="status" data-i18n="shell.loadingApi">Loading API…</span>
+          <span class="spacer"></span>
+          <span class="sk search-trigger desktop-only" aria-hidden="true"></span>
+          <span class="sk persona" style="inline-size:7.5rem" aria-hidden="true"></span>
+        </header>
+        <div class="mobile-switch" aria-hidden="true"><div class="segmented" style="inline-size:100%"><span class="sk" style="display:block;inline-size:100%;block-size:2.5rem"></span></div></div>
+        <div class="workspace" data-view="request" aria-hidden="true">
+          <div class="sidebar">
+            <div class="tabs"><span class="tab"><span class="sk" style="display:block;inline-size:6rem;block-size:0.7rem"></span></span><span class="tab"><span class="sk" style="display:block;inline-size:4.5rem;block-size:0.7rem"></span></span></div>
+            <div class="sidebar-search"><div class="input-sm sk"></div></div>
+            <div class="nav">
+              <div class="nav-item"><span class="sk" style="display:block;inline-size:40%;block-size:0.6rem"></span></div>
+              <div class="nav-item"><span class="sk" style="display:block;inline-size:3rem;block-size:1.25rem"></span><span class="sk" style="display:block;inline-size:58%;block-size:0.7rem"></span></div>
+              <div class="nav-item"><span class="sk" style="display:block;inline-size:3rem;block-size:1.25rem"></span><span class="sk" style="display:block;inline-size:80%;block-size:0.7rem"></span></div>
+              <div class="nav-item"><span class="sk" style="display:block;inline-size:40%;block-size:0.6rem"></span></div>
+              <div class="nav-item"><span class="sk" style="display:block;inline-size:3rem;block-size:1.25rem"></span><span class="sk" style="display:block;inline-size:76%;block-size:0.7rem"></span></div>
+              <div class="nav-item"><span class="sk" style="display:block;inline-size:3rem;block-size:1.25rem"></span><span class="sk" style="display:block;inline-size:50%;block-size:0.7rem"></span></div>
+            </div>
+            <div class="pane-bar side-bar"><span class="bar-text"><span class="sk" style="display:block;inline-size:7rem;block-size:0.7rem"></span></span></div>
+          </div>
+          <div class="pane request">
+            <div class="ctx-bar"><nav class="crumbs"><span class="sk" style="display:block;inline-size:9rem;block-size:0.7rem"></span></nav><div class="end"><span class="sk" style="display:block;inline-size:9rem;block-size:1.75rem"></span></div></div>
+            <div class="pane-scroll">
+              <div class="op-head">
+                <span class="sk" style="display:block;inline-size:16rem;block-size:1.6rem"></span>
+                <span class="sk" style="display:block;inline-size:min(24rem,90%);block-size:0.8rem;margin-block-start:0.75rem"></span>
+                <div class="urlbar sk" style="border:0"></div>
+              </div>
+              <div class="tabs" style="margin-block-start:1rem"><span class="tab"><span class="sk" style="display:block;inline-size:3.5rem;block-size:0.7rem"></span></span><span class="tab"><span class="sk" style="display:block;inline-size:4.5rem;block-size:0.7rem"></span></span><span class="tab"><span class="sk" style="display:block;inline-size:3rem;block-size:0.7rem"></span></span></div>
+              <div class="form"><div class="fields">
+                <div class="field"><span class="sk" style="display:block;inline-size:7rem;block-size:0.8rem;margin-block:0.35rem"></span><span class="control sk" style="border:0"></span><span class="assist"></span></div>
+                <div class="field"><span class="sk" style="display:block;inline-size:7rem;block-size:0.8rem;margin-block:0.35rem"></span><span class="control sk" style="border:0"></span><span class="assist"></span></div>
+                <div class="field half"><span class="sk" style="display:block;inline-size:5rem;block-size:0.8rem;margin-block:0.35rem"></span><span class="control sk" style="border:0"></span><span class="assist"></span></div>
+                <div class="field half"><span class="sk" style="display:block;inline-size:5rem;block-size:0.8rem;margin-block:0.35rem"></span><span class="control sk" style="border:0"></span><span class="assist"></span></div>
+              </div></div>
+            </div>
+            <div class="actionbar"><span class="status"><span class="spinner" aria-hidden="true"></span></span><span class="btn btn-run btn-send sk" style="border:0"></span><span class="btn btn-run btn-preview sk" style="border:0"></span></div>
+          </div>
+          <div class="pane response">
+            <div class="resp-head"><span class="sk" style="display:block;inline-size:8rem;block-size:0.7rem"></span></div>
+            <div class="tabs"><span class="tab"><span class="sk" style="display:block;inline-size:4rem;block-size:0.7rem"></span></span><span class="tab"><span class="sk" style="display:block;inline-size:4rem;block-size:0.7rem"></span></span><span class="tab"><span class="sk" style="display:block;inline-size:5rem;block-size:0.7rem"></span></span></div>
+            <div class="pane-scroll"><div class="result-body"><div class="state"><span class="sk" style="display:block;inline-size:2.25rem;block-size:2.25rem;border-radius:var(--r-lg)"></span><span class="sk" style="display:block;inline-size:14rem;block-size:1rem"></span><span class="sk" style="display:block;inline-size:min(20rem,90%);block-size:0.7rem"></span><span class="sk" style="display:block;inline-size:min(17rem,80%);block-size:0.7rem"></span></div></div></div>
+            <div class="pane-bar result-bar"><span class="bar-text"><span class="sk" style="display:block;inline-size:11rem;block-size:0.7rem"></span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="icons.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

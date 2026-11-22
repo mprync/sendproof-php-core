@@ -1,0 +1,95 @@
+// English strings for data stores (spec/data-stores.md, mocks v6): store nouns, the document diff,
+// store groups and coverage, Db command logs, and "Preview unavailable" before and during a run.
+// Merged into en.js. Store names (MongoDB, Redis…), commands, `preview: false` and every captured
+// value are data and never appear here. Plural entries are keyed by Intl.PluralRules category.
+export default {
+  // What each kind of store calls the place a record lives, and its records.
+  'store.sql': 'SQL database',
+  'store.container.sql': 'Table', 'store.container.document': 'Collection', 'store.container.item': 'Table',
+  'store.container.key': 'Key prefix', 'store.container.index': 'Index', 'store.container.container': 'Container',
+  'store.count.sql': { one: '{n} row', other: '{n} rows' },
+  'store.count.document': { one: '{n} document', other: '{n} documents' },
+  'store.count.item': { one: '{n} item', other: '{n} items' },
+  'store.count.key': { one: '{n} key', other: '{n} keys' },
+  'store.count.index': { one: '{n} document', other: '{n} documents' },
+  'store.count.container': { one: '{n} item', other: '{n} items' },
+
+  // Document diff
+  'diff.fields': { one: '{n} field', other: '{n} fields' },
+  'diff.items': { one: '{n} item', other: '{n} items' },
+  'diff.changes': { one: '{n} change', other: '{n} changes' },
+  'diff.changed': { one: '{n} changed', other: '{n} changed' },
+  'diff.added': { one: '{n} added', other: '{n} added' },
+  'diff.removed': { one: '{n} removed', other: '{n} removed' },
+  'diff.noChange': 'No field changed',
+  'diff.newRecord.document': 'New document', 'diff.newRecord.item': 'New item', 'diff.newRecord.key': 'New key', 'diff.newRecord.row': 'New row',
+  'diff.removedRecord.document': 'Document removed', 'diff.removedRecord.item': 'Item removed', 'diff.removedRecord.key': 'Key removed', 'diff.removedRecord.row': 'Row removed',
+  'diff.viaUpsert': 'via upsert', 'diff.viaReplace': 'whole document replaced',
+  'diff.changesOnly': 'Changes only', 'diff.show': 'Show',
+  'diff.view.diff': 'Diff', 'diff.view.before': 'Before', 'diff.view.after': 'After',
+  'diff.fold': 'Fold or unfold {name}',
+  'diff.redacted': 'redacted', 'diff.redactedTip': 'A secret field: Sendproof never captures its value',
+
+  // Store groups in the Database tab, and what Sendproof covers
+  'stores.rolledBody': 'These are the changes this request would write to {stores}.',
+  'stores.rolledBodyAs': 'These are the changes this request would write to {stores} as {name}.',
+  'stores.state.rolledBack': 'Rolled back', 'stores.state.aborted': 'Transaction aborted',
+  'stores.state.blocked': 'Writes blocked', 'stores.state.committed': 'Committed',
+  'stores.strip': 'Stores in this result', 'stores.readOnly': 'Read, not written:',
+  'stores.cover.in': 'Covered in {env}:',
+  'stores.cover.rolled': { one: '{stores} rolls back', other: '{stores} roll back' },
+  'stores.cover.blocked': { one: '{stores} blocks writes', other: '{stores} block writes' },
+  'stores.cover.separator': '; ',
+  'stores.cover.limit': 'Stores and clients Sendproof didn’t hook aren’t covered.',
+
+  // The environment chip's coverage panel
+  'cov.open': 'What Preview covers here',
+  'cov.title': 'What Preview covers in {env}',
+  'cov.mode.preview': 'Preview', 'cov.mode.guard': 'Guard only',
+  'cov.preview': 'Writes roll back after every Preview',
+  'cov.guard': 'Reads run; the first write stops the Preview',
+  'cov.limit': 'Only these stores are covered. A store or client Sendproof didn’t hook is neither rolled back nor blocked.',
+
+  // Db command logs
+  'logs.level.db': 'Database',
+  'logs.queries': 'Queries', 'logs.queriesGroup': 'Queries by store',
+  'logs.filterPlaceholderDb': 'Filter messages, commands or keys',
+  'logs.blocked': 'Blocked', 'logs.blockedBody': 'The write guard refused {op}: it never reached {store}.',
+  'logs.field.store': 'Store', 'logs.field.documents': 'Documents', 'logs.field.keys': 'Keys', 'logs.field.items': 'Items', 'logs.field.error': 'Error',
+  'logs.command': 'Command', 'logs.cmd.values': 'Command · values hidden', 'logs.cmd.redis': 'Command · key kept, arguments hidden',
+  'logs.cmd.statement': '{op} · values hidden', 'logs.valueHidden': 'Value hidden',
+  'logs.parameters': 'Parameters', 'logs.secretNames': 'Secret names are never captured',
+  'logs.redisNote': 'Redis arguments have no names to check, so every argument after the key is hidden.',
+  'logs.copyCommand': 'Copy command', 'logs.what.command': 'Command',
+
+  // Preview unavailable, known in advance (preview: false)
+  'dock.title': 'Preview unavailable',
+  'dock.why': '{stores} can’t roll back, so Sendproof won’t run a Preview of this operation. Send commits for real and asks first.',
+  'dock.whyNoStore': 'Sendproof won’t run a Preview of this operation. Send commits for real and asks first.',
+  'dock.by': 'Marked by the API author · {mark}', 'dock.more': 'Why?',
+  'bar.sendOnly': 'Send only · asks before it commits',
+  'bar.previewOffTip': 'Preview unavailable for this operation',
+  'bar.confirmStores': 'Send for real? This writes to {stores} and can’t be undone.',
+  'side.noPreview': 'No Preview',
+  'res.before.response.previewOff': 'Run the request to see the status, body and timing. This operation writes to {stores}, which can’t roll back, so it can only be sent for real.',
+  'res.before.response.previewOffNoStore': 'Run the request to see the status, body and timing. This operation can’t be previewed, so it can only be sent for real.',
+  'res.step.previewOff': 'Preview isn’t available here',
+
+  // Preview unavailable, caught mid-request (409)
+  'blk.code': 'Preview unavailable', 'blk.eyebrow': 'Blocked by the write guard',
+  'blk.title': 'Preview stopped before writing to {store}',
+  'blk.bodyGuard': 'The handler sent {op} to {store}. {store} can’t roll back, so Sendproof refused the command before it left the API.',
+  'blk.bodyRefused': 'The handler sent {op} to {store}, which can’t run it inside a Preview, so Sendproof refused it before it left the API. {detail}.',
+  'blk.safe': 'Nothing was written',
+  'blk.safeNote': 'A blocked Preview keeps nothing else either: no body, changes, logs or effects.',
+  'blk.refused': '{op} refused, never sent', 'blk.effects': 'Side effects', 'blk.discarded': 'Held, then discarded',
+  'blk.next': 'What to do next',
+  'blk.sendNote': 'Commits for real and asks first.',
+  'blk.sendNoteTraced': 'Commits for real and asks first. Traced Send records the rows, documents and commands as they’re committed.',
+  'blk.author': 'For the API author', 'blk.authorBody': 'Mark the route with {mark} so the Preview button explains this before anyone runs it.',
+  'blk.copy': 'Copy', 'blk.raw': 'Response body',
+  'blk.tabTitle': 'A blocked Preview keeps nothing',
+  'blk.tabBody': 'The write guard stopped this Preview at {store}, so nothing was captured. Send for real records changes, effects and logs as they’re committed.',
+  'bar.previewBlocked': 'Preview blocked',
+  'bar.lastBlocked': 'Last Preview blocked · {store} write',
+};
