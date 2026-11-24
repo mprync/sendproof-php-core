@@ -292,6 +292,13 @@
 .doc-pane .prose ul, .doc-pane .prose ol { margin: 0.5rem 0; padding-inline-start: 1.25rem; }
 .doc-pane .prose li { margin: 0.2rem 0; }
 .doc-pane .prose h4 { margin: 1rem 0 0.25rem; font-size: var(--fs-base); color: var(--text); }
+/* A description's table: scrolls sideways on its own when it can't fit, never the page. */
+.prose .md-table { overflow-x: auto; margin: 0.75rem 0; border: 1px solid var(--line); border-radius: var(--r-lg); }
+.prose .md-table table { border-collapse: collapse; inline-size: 100%; font-size: var(--fs-sm); line-height: 1.5; }
+.prose .md-table :is(th, td) { padding: 0.5rem 0.75rem; text-align: start; vertical-align: top; border-block-end: 1px solid var(--line); }
+.prose .md-table tbody tr:last-child td { border-block-end: 0; }
+.prose .md-table th { background: var(--panel); color: var(--text); font-weight: 500; white-space: nowrap; }
+.prose .md-table td:first-child { white-space: nowrap; }
 .doc-pane .doc-meta { margin-block-start: 0.75rem; }
 .doc-pane .doc-meta code { font-size: var(--fs-md); }
 

@@ -10,6 +10,13 @@ final class Protocol
     public const PREFIX = '/sendproof/_preview';
     public const ROLLBACK_PREFERENCE = 'tx=rollback';
     public const TRACE_HEADER = 'X-Sendproof-Trace';
+    public const SESSION_HEADER = 'Sendproof-Session';
+
+    /** @return array{status:int,title:string,code:string} */
+    public static function sessionNotFound(): array
+    {
+        return ['status' => 404, 'title' => 'Preview session not found.', 'code' => 'session_not_found'];
+    }
 
     /** True when any Prefer value asks for `tx=rollback`, possibly among other preferences. */
     public static function requestsRollback(array $preferValues): bool

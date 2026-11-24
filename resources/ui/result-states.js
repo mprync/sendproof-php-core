@@ -76,7 +76,7 @@ export const runningHeader = (preview, identity) =>
    <button type="button" class="btn btn-ghost btn-sm" data-action="cancel-request" ${shortcutAttrs('escape')}>${esc(t('bar.cancel'))} ${shortcutHint('escape')}</button>`;
 
 /** The head row for a response, with Copy as cURL and the next step. */
-export function responseHeader(result, { resourceLabel, match = '' } = {}) {
+export function responseHeader(result, { resourceLabel, match = '', plain = false } = {}) {
   const ok = result.status < 400;
   const location = header(result, 'location');
   let resource;
@@ -88,7 +88,7 @@ export function responseHeader(result, { resourceLabel, match = '' } = {}) {
   }
   const tracedPill = !result.preview && result.traceId
     ? `<span class="pill pill-ok">${icon('send', true)}${esc(t('res.traced'))}</span>` : pill(result.preview);
-  const action = result.preview && ok
+  const action = plain ? '' : result.preview && ok
     ? `<button type="button" class="btn btn-sm" data-action="send" ${shortcutAttrs('send')}>${icon('send', true)}${esc(t('res.sendForReal'))}</button>`
     : resource ? `<a class="btn btn-sm result-open" href="${esc(resource)}" target="_blank" rel="noopener noreferrer" data-location-open ${shortcutAttrs('follow-response')}>${esc(resourceLabel || t('res.openResource'))} ${shortcutHint('follow-response')}</a>` : '';
   return `${tracedPill}<span class="status-code ${statusTone(result.status)}">${icon(ok ? 'check' : result.status === 401 ? 'lock' : 'alert', true)}<bdi class="ltr">${esc(statusText(result.status))}</bdi></span>${metrics(result)}${match}<span class="spacer"></span>

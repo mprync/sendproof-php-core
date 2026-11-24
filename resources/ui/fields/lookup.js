@@ -174,8 +174,9 @@ export function lookupControl(context, metadata, schema, path, id, required, lab
     }
     refresh();
     renderSelection();
-    // The status line counts the records once they're known (unless an error has taken it over).
-    const hint = control.closest?.('.field')?.querySelector(':scope > .assist:not(.is-error):not(.is-generated) .field-hint');
+    // The status line counts the records once they're known (unless an error has taken it over, or a
+    // journey step says where the bound value came from).
+    const hint = control.closest?.('.field:not([data-bound])')?.querySelector(':scope > .assist:not(.is-error):not(.is-generated) .field-hint');
     if (hint) { hint.innerHTML = control.lookupStatus(); hint.dataset.base = hint.innerHTML; }
   }
 

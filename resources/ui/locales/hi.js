@@ -4,6 +4,7 @@
 // property = प्रॉपर्टी, attribute = एट्रिब्यूट, parameter = पैरामीटर, field = फ़ील्ड.
 import capture from './hi-capture.js';
 import stores from './hi-stores.js';
+import journeys from './hi-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -13,6 +14,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'फिर',
     'unit.bytes': '{n} B',

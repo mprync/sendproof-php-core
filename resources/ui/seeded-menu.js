@@ -12,7 +12,7 @@ const initials = name => String(name || '?').trim().split(/\s+/).slice(0, 2).map
  * Opens the menu under `button`. `onSignedIn()` runs after the API accepted the sign-in; failures
  * are shown inside the menu and nothing else changes.
  */
-export async function openSeededMenu(button, { capabilities, onSignedIn }) {
+export async function openSeededMenu(button, { capabilities, onSignedIn, confirmPersona }) {
   const provider = personasProvider(capabilities);
   if (!provider) return;
   const pop = openPopoverAt(button, `<div class="pop seeded-pop" role="menu" aria-label="${esc(t('auth.out.seeded'))}">
@@ -55,6 +55,7 @@ export async function openSeededMenu(button, { capabilities, onSignedIn }) {
     const item = event.target.closest('[data-seeded]');
     const user = item && users[Number(item.dataset.seeded)];
     if (!user?.email) return;
+    if (confirmPersona && !(await confirmPersona(user))) return;
     item.setAttribute('aria-busy', 'true');
     try {
       const response = await fetch(`${provider.url.replace(/\/$/, '')}/${encodeURIComponent(user.email)}`, { method: 'POST', credentials: 'include', redirect: 'error' });

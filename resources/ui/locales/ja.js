@@ -2,6 +2,7 @@
 // Plural entries carry only `other`: Japanese has a single plural category.
 import capture from './ja-capture.js';
 import stores from './ja-stores.js';
+import journeys from './ja-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -11,6 +12,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': '次に',
     'unit.bytes': '{n} B',

@@ -43,7 +43,7 @@ export function requestExample(source, document) {
 }
 
 /** Own request editor rendering and conversion into a prepared request. */
-export function createRequestEditor({ state, basePath, $, onLookupPreview, onHeadersChange, sensitiveNames = () => [], onFilled = () => {} }) {
+export function createRequestEditor({ state, basePath, $, onLookupPreview, onHeadersChange, sensitiveNames = () => [], onFilled = () => {}, onRendered = () => {} }) {
   let includeCookie = true;
 
   function validationError(issues) {
@@ -218,7 +218,13 @@ export function createRequestEditor({ state, basePath, $, onLookupPreview, onHea
     return `<div class="section-label"><span id="body-legend">${esc(t('req.body'))} ${name ? `<a class="schema-link" href="#model/${encodeURIComponent(name.replace(/\[\]$/, ''))}" data-model="${esc(name.replace(/\[\]$/, ''))}" title="${esc(t('req.openModel', { name }))}">${esc(name)}</a>` : ''}</span><span class="rule" aria-hidden="true"></span>${switcher}</div>`;
   }
 
+  /** Draws the operation, then lets a journey step mark its bound fields (onRendered). */
   function renderOperation() {
+    renderOperationNow();
+    onRendered();
+  }
+
+  function renderOperationNow() {
     state.forms.forEach(form => form.destroy());
     state.forms = [];
     state.bodyForm = null;

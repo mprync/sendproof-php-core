@@ -2,6 +2,7 @@
 // Plural entries use one / many / other; `many` repeats the `other` wording (the large-number form).
 import capture from './pt-BR-capture.js';
 import stores from './pt-BR-stores.js';
+import journeys from './pt-BR-journeys.js';
 
 const p = (one, other) => ({ one, many: other, other });
 
@@ -13,6 +14,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'depois',
     'unit.bytes': '{n} B',

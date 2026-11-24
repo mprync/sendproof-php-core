@@ -3,6 +3,7 @@
 // Terminologie: požadavek, odpověď, pole, schéma, přihlásit se, náhled, odeslat, operace, model, vlastnost, atribut, parametr.
 import capture from './cs-capture.js';
 import stores from './cs-stores.js';
+import journeys from './cs-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -12,6 +13,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'potom',
     'unit.bytes': '{n} B',

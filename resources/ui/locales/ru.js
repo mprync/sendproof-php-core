@@ -4,6 +4,7 @@
 // атрибут (attribute), параметр (parameter). Plurals give one, few, many and other.
 import capture from './ru-capture.js';
 import stores from './ru-stores.js';
+import journeys from './ru-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -13,6 +14,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'затем',
     'unit.bytes': '{n} Б',

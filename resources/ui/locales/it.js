@@ -2,6 +2,7 @@
 // Italian has the plural categories one, many and other; `many` reads like `other`, so p() builds all three.
 import capture from './it-capture.js';
 import stores from './it-stores.js';
+import journeys from './it-journeys.js';
 
 const p = (one, other) => ({ one, many: other, other });
 
@@ -13,6 +14,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'poi',
     'unit.bytes': '{n} B',

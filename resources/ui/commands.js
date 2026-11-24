@@ -11,7 +11,7 @@ function editing(target) {
 export function createCommands({ $, state, chooseTab, chooseResult, chooseOperation, fill, preview,
   send, openPalette, openSheet, openSidebar, changePane, issues, addHeader, bulkEdit, toggleHeader, copyResponse,
   openDisplay, openHistory, toggleTheme, toggleDocs, sidebarTab, modelBack, generate, toggleTrace, traceAvailable,
-  reloadSpec, canReload,
+  reloadSpec, canReload, journeys,
 }) {
   const click = selector => $(selector)?.click();
   const requestTab = () => [...document.querySelectorAll('.request-tabs [data-request-tab]')];
@@ -101,6 +101,11 @@ export function createCommands({ $, state, chooseTab, chooseResult, chooseOperat
     'change-prev': () => nextChange(-1),
     preview,
     send,
+    'mode-spec': () => journeys?.switchMode('spec'),
+    'mode-journeys': () => journeys?.switchMode('journeys'),
+    'step-previous': () => journeys?.stepBy(-1),
+    'step-next': () => journeys?.stepBy(1),
+    'run-to-end': () => journeys?.runToEnd(),
   };
   for (const [id, definition] of Object.entries(SHORTCUTS)) {
     if (definition.mode) actions[id] = () => fill(definition.mode);
@@ -108,7 +113,9 @@ export function createCommands({ $, state, chooseTab, chooseResult, chooseOperat
 
   const canRun = {
     'editor-mode': () => !!$('[data-request-tab="Body"]') && state.view === 'try',
-    docs: () => !!state.op && ['try', 'docs'].includes(state.view),
+    docs: () => !!state.op && ['try', 'docs'].includes(state.view) && state.mode !== 'journeys',
+    next: () => state.mode !== 'journeys',
+    previous: () => state.mode !== 'journeys',
     'model-back': () => state.view === 'model' && !!backTarget(state.route),
     generate: () => state.view === 'try',
     'generate-menu': () => state.view === 'try',
@@ -131,8 +138,13 @@ export function createCommands({ $, state, chooseTab, chooseResult, chooseOperat
     'wrap-lines': () => !!$('.response-viewer [data-wrap]:not([hidden])'),
     'change-next': () => !!$('.response .table-change'),
     'change-prev': () => !!$('.response .table-change'),
-    preview: () => !!$('.actionbar [data-action="preview"]:not(:disabled)'),
-    send: () => !!$('.actionbar [data-action="send"]:not(:disabled), [data-action="confirm-send"]'),
+    preview: () => !!$('.workspace > .pane:not([hidden]) .actionbar :is([data-action="preview"], [data-action="journey-preview-run"], [data-action="journey-next-run"]):not(:disabled)'),
+    'mode-spec': () => !!journeys?.enabled() && state.mode === 'journeys',
+    'mode-journeys': () => !!journeys?.enabled() && state.mode !== 'journeys',
+    'step-previous': () => !!journeys?.stepActive(),
+    'step-next': () => !!journeys?.stepActive(),
+    'run-to-end': () => !!journeys?.canRunToEnd(),
+    send: () => !!$('.workspace > .pane:not([hidden]) .actionbar :is([data-action="send"], [data-action="journey-send-run"]):not(:disabled), [data-action="confirm-send"]'),
   };
   function tabCommands() {
     return [...requestTab().map((button, index) => ({
@@ -161,6 +173,17 @@ export function createCommands({ $, state, chooseTab, chooseResult, chooseOperat
     if (modal && !(modal.classList.contains('palette') && matchesShortcut('shortcuts', event))) return false;
 
     const isEditor = editing(target);
+    // The second key of a pending sequence (G then J) wins over a bare-key chord (J, next operation).
+    if (!isEditor && sequenceAt && performance.now() - sequenceAt.time < 900 && !event.altKey && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
+      const key = event.key.toUpperCase();
+      const match = Object.entries(SHORTCUTS).find(([id, definition]) => definition.sequence?.[0] === sequenceAt.key && definition.sequence[1] === key && (!canRun[id] || canRun[id]()));
+      if (match && actions[match[0]]) {
+        sequenceAt = 0;
+        event.preventDefault();
+        actions[match[0]](target);
+        return true;
+      }
+    }
     const local = new Set(['add-row', 'remove-row', 'toggle-header']);
     for (const id of ['add-row', 'remove-row', 'toggle-header', ...Object.keys(actions).filter(id => !local.has(id))]) {
       const definition = SHORTCUTS[id];

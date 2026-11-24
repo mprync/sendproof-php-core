@@ -28,16 +28,19 @@ import { renderModel } from './model-view.js';
 import { renderOverview } from './overview-view.js';
 import { schemaName as nameOfSchema } from './schema-model.js';
 import { bindToggletips } from './toggletip.js';
-import { backTarget, createHistory, followModel, formatRoute, parseRoute } from './router.js';
+import { backTarget, createHistory, followModel, formatRoute, isJourneyRoute, parseRoute } from './router.js';
+import { createJourneys } from './journeys.js';
 import { findOperation, opKey } from './operations.js';
 import { contextBar } from './context-bar.js';
 import { watchCrumbs } from './crumb-fit.js';
+import { watchBars } from './bar-fit.js';
 import { openSeededMenu } from './seeded-menu.js';
 import { resolvePersonaAccess } from './personas.js';
 import { carriedValues, replacements } from './deprecation.js';
 
 applySettings();
 watchCrumbs();
+watchBars();
 const root = document.querySelector('#app');
 for (const node of root.querySelectorAll('[data-i18n]')) node.textContent = t(node.dataset.i18n);
 const loadingShell = root.firstElementChild.cloneNode(true);
@@ -45,7 +48,7 @@ const basePath = new URL('../', document.baseURI).pathname;
 const state = {
   cap: null, doc: null, ops: [], op: null, forms: [], bodyForm: null, body: undefined,
   tab: 'Form', resultTab: 'Response', result: null, history: [], headers: [], documentUrl: null,
-  view: 'overview', model: null, modelFrom: null, route: { kind: 'overview' }, samples: [],
+  view: 'overview', model: null, modelFrom: null, route: { kind: 'overview' }, samples: [], mode: 'spec',
 };
 const $ = selector => document.querySelector(selector);
 let documentLoad = 0;
@@ -63,7 +66,7 @@ const {
   generateField, fieldCount,
 } = createRequestEditor({
   state, basePath, $, updateSnippet: () => {}, onLookupPreview: () => run(true), onHeadersChange: refreshIssues,
-  sensitiveNames, onFilled: count => renderBarStatus(count),
+  sensitiveNames, onFilled: count => renderBarStatus(count), onRendered: () => journeys?.decorateStep(),
 });
 const {
   renderResult, renderBar, run, showError, copyFailedRequest, copyCurl, cancel, cancelConfirmation, previewAvailable,
@@ -71,15 +74,24 @@ const {
   state, basePath, $, readRequest, sensitiveNames, renderOperation, issues, selectView: setPane, onFollowUp: followUp,
   schemaName: schema => nameOfSchema(schema, state.doc), fillable: () => fieldCount() > 0,
   onCompleted: (result, { preview }) => { if (!preview && state.op?.method !== 'GET') refreshIdentity(); },
+  journey: () => journeys?.hooks(), databaseExtra: () => journeys?.copyCSharpButton() ?? '',
 });
-const sidebar = createSidebar({ state, $ });
+/** Journeys mode (journeys.js): only when capabilities list journeys or Preview sessions. */
+const journeys = createJourneys({
+  state, $, basePath, results: { run, renderResult, renderBar }, navigate: (route, options) => navigate(route, options),
+  openOperation: openJourneyOperation, announce: text => { const slot = $('[data-request-announcement]'); if (slot) slot.textContent = text; },
+  refreshIdentity: () => refreshIdentity(),
+});
+journeys.setReadRequest(() => readRequest());
+journeys.setRedraw(() => redrawJourneys());
+const sidebar = createSidebar({ state, $, journeys: journeys.sidebar });
 const { palette } = createNavigation({
   state, $, selectOperation, run, renderOperation, openModel: name => openModel(name), commands: () => commandRegistry.available(),
 });
 const commandRegistry = createCommands({
   state, $, chooseTab: selectRequestTab, chooseResult: selectResultTab, chooseOperation: selectOperation,
   fill: async mode => { cancelConfirmation(); await fillSample(mode); refreshIssues(); },
-  preview: () => run(true), send: () => run(false, !!$('[data-action="confirm-send"]')),
+  preview: () => runRequest(true), send: () => runRequest(false, !!$('[data-action="confirm-send"]')), journeys,
   copyResponse: () => $('.response [data-action="copy-response"]')?.click(),
   openPalette: palette, openSheet: () => showShortcuts($('#overlay')), openSidebar: toggleNavigation,
   changePane: setPane, issues, addHeader, bulkEdit: showBulkHeaders, toggleHeader,
@@ -222,6 +234,12 @@ async function loadDocument(url) {
  * operation (Try it ⇄ Docs) and reset when it moves to another one.
  */
 function applyRoute(route, { reset } = {}) {
+  if (isJourneyRoute(route)) {
+    if (journeys.enabled()) return (state.route = journeys.applyRoute(route));
+    route = { kind: 'overview' };
+  }
+  // Leaving Journeys mode from a step starts a fresh draft, so no bound value or journey bar stays behind.
+  if (state.mode === 'journeys') { state.mode = 'spec'; if (state.view === 'try') reset ??= {}; }
   let shown = route;
   if (route.kind === 'op' || route.kind === 'docs') {
     const op = findOperation(state.ops, route.id);
@@ -286,7 +304,7 @@ function navigate(route, { reset, focus = true, replace = false } = {}) {
   nav.go(route, { replace });
   const shown = applyRoute(route, { reset });
   if (shown.kind !== route.kind || shown.name !== route.name) nav.go(shown, { replace: true });
-  if (route.kind === 'op' || route.kind === 'docs') { if (sidebar.tab !== 'operations') sidebar.selectTab('operations'); }
+  if ((route.kind === 'op' || route.kind === 'docs') && state.mode !== 'journeys') { if (sidebar.tab !== 'operations') sidebar.selectTab('operations'); }
   applyView();
   restoreScroll();
   if (focus) focusPage();
@@ -294,7 +312,7 @@ function navigate(route, { reset, focus = true, replace = false } = {}) {
 
 /** Moves focus to the page's heading, so keyboard and screen reader users land on the new page. */
 function focusPage() {
-  const heading = state.view === 'try' ? $('#op-title') || $('#request') : $('#doc-pane h1');
+  const heading = state.view === 'try' ? $('#op-title') || $('#request') : $('#doc-pane h1') || $('#doc-pane');
   heading?.focus?.({ preventScroll: true });
 }
 
@@ -350,6 +368,48 @@ function renderShell() {
   renderBar();
   renderResult();
   applyView();
+  journeys.load();
+}
+
+/** A journey step opens its operation's own screen with its bound values (journeys.js). */
+function openJourneyOperation(op, parameters, body) {
+  resetOperation(op, parameters);
+  state.body = body;
+  state.tab = Object.keys(parameters).some(key => /^(path|query|cookie):/.test(key)) ? 'Params' : 'Form';
+  if ($('#context')) renderOperation();
+}
+
+/** Preview and Send: a journey step runs as a step of its run; anything else as before. */
+async function runRequest(preview, confirmed = false) {
+  // ⌘↵ and ⇧⌘↵ press the bar's own buttons in Journeys mode: Preview run or Send run on an
+  // overview or summary (Send run when the journey is Send only), Preview step N+1 after a step.
+  if (state.view === 'journey' || state.view === 'jrun') {
+    const bar = $('#doc-pane .actionbar');
+    (bar?.querySelector(preview ? '[data-action="journey-preview-run"]' : '[data-action="journey-send-run"]:not(.btn-primary)')
+      ?? (preview ? bar?.querySelector('[data-action="journey-send-run"].btn-primary') : null))?.click();
+    return;
+  }
+  const next = preview && journeys.stepActive() && $('.actionbar [data-action="journey-next-run"]:not(:disabled)');
+  if (next) { next.click(); return; }
+  if (!confirmed && journeys.stepActive() && (await journeys.runStep(preview))) return;
+  return run(preview, confirmed);
+}
+
+/** After a journey run changes: the sidebar's rail, the step's strip, bar and result, or the reading panes. */
+function redrawJourneys() {
+  if (!$('.workspace')) return;
+  if (state.view === 'journey' || state.view === 'jrun') {
+    const scroll = currentScroll();
+    journeys.renderReading($('#doc-pane'), $('#aside-pane'));
+    for (const pane of [$('#doc-pane'), $('#aside-pane')]) for (const node of pane.querySelectorAll('.pane-scroll')) node.dataset.scroll = pane.id === 'doc-pane' ? 'main' : 'aside';
+    restoreScroll(scroll);
+  } else if (state.view === 'try') {
+    const context = journeys.stepChrome();
+    if (context) $('#context').innerHTML = context;
+    renderBar();
+    renderResult();
+  }
+  sidebar.render();
 }
 
 /**
@@ -366,18 +426,32 @@ function applyView() {
   $('#request').hidden = reading;
   $('.response').hidden = reading;
   main.hidden = aside.hidden = !reading;
-  $('.mobile-switch').hidden = reading;
+  // Journeys' reading views keep the phone's pane switch (mock m33): the journey or summary, then its runs.
+  const journeyReading = state.view === 'journey' || state.view === 'jrun';
+  $('.mobile-switch').hidden = reading && !journeyReading;
+  workspace.classList.toggle('j7-reading', journeyReading);
+  // A new journey page starts at its top: on a phone the workspace itself scrolls.
+  if (journeyReading && (state.shownView !== state.view || state.shownRoute !== formatRoute(state.route))) { setPane('request'); workspace.scrollTop = 0; }
+  state.shownRoute = formatRoute(state.route);
+  state.shownView = state.view;
+  const paneNames = journeys.paneNames(state.view);
+  for (const button of document.querySelectorAll('.mobile-switch [data-view]')) button.textContent = paneNames[button.dataset.view === 'request' ? 0 : 1];
   const route = state.route;
   const ui = state.op ? docsMemory.get(opKey(state.op)) ?? docsMemory.set(opKey(state.op), newDocsState()).get(opKey(state.op)) : newDocsState();
   const context = { state, route, ui, samples: state.samples, $, basePath };
   if (state.view === 'docs') { renderDocs(main, aside, context); main.setAttribute('aria-labelledby', 'doc-title'); aside.setAttribute('aria-label', t('docs.aside')); }
   else if (state.view === 'model') { renderModel(main, aside, context); main.setAttribute('aria-labelledby', 'model-title'); aside.setAttribute('aria-label', t('model.aside')); }
   else if (state.view === 'overview') { renderOverview(main, aside, context); main.setAttribute('aria-labelledby', 'ov-title'); aside.setAttribute('aria-label', t('overview.start')); }
+  else if (state.view === 'journey' || state.view === 'jrun') { journeys.renderReading(main, aside); main.setAttribute('aria-labelledby', 'jr-title'); aside.setAttribute('aria-label', t('jr.runs')); }
   else {
     main.replaceChildren();
     aside.replaceChildren();
-    $('#context').innerHTML = contextBar(state.op ? { kind: 'op', op: state.op, view: 'try' } : { kind: 'overview' });
+    $('#context').innerHTML = journeys.stepChrome() ?? contextBar(state.op ? { kind: 'op', op: state.op, view: 'try' } : { kind: 'overview' });
   }
+  if (state.view !== 'try') journeys.stepChrome();
+  // A journey step draws its own bar and Expected tab; leaving one puts the operation's back.
+  if (state.view === 'try') { renderBar(); renderResult(); }
+  journeys.markMode();
   for (const pane of [main, aside]) for (const node of pane.querySelectorAll('.pane-scroll')) node.dataset.scroll = pane === main ? 'main' : 'aside';
   $('#request .pane-scroll').dataset.scroll = 'main';
   $('.skip-link').setAttribute('href', reading ? '#doc-pane' : '#request');
@@ -560,7 +634,7 @@ function openSignIn() {
   state.history = [];
   state.result = null;
   const back = () => start();
-  showSignIn(root, state.cap, back, back);
+  showSignIn(root, state.cap, back, back, { confirmPersona: user => journeys.confirmPersona(user) });
 }
 
 /**
@@ -609,12 +683,12 @@ const handlers = {
   issues: () => issues.toggle(),
   sample: button => autofill(button, refreshIssues),
   'undo-fill': async () => { await fillSample('undo'); refreshIssues(); },
-  send: () => run(false),
-  preview: () => run(true),
+  send: () => runRequest(false),
+  preview: () => runRequest(true),
   'view-try': () => setView('try', { focus: true }),
   'view-docs': () => setView('docs', { focus: true }),
   'docs-try': () => openDocumentedExample(),
-  'seeded-menu': button => openSeededMenu(button, { capabilities: state.cap, onSignedIn: () => refreshIdentity() }),
+  'seeded-menu': button => openSeededMenu(button, { capabilities: state.cap, onSignedIn: () => refreshIdentity(), confirmPersona: user => journeys.confirmPersona(user) }),
   'toggle-groups': () => sidebar.toggleAll(),
   'traced-on': () => setTraced(true),
   'traced-off': () => setTraced(false),
@@ -627,6 +701,7 @@ const handlers = {
 
 root.addEventListener('click', async event => {
   if (event.target.closest('#editor') || event.target.closest('[data-action="sample"]')) cancelConfirmation();
+  if (journeys.click(event)) return;
   // Links that are plain navigation keep the browser's own behaviour for new tabs and windows.
   const plain = !(event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey);
   const crumb = event.target.closest('[data-crumb-route]');
@@ -715,6 +790,7 @@ root.addEventListener('change', event => {
 addEventListener('popstate', onPopState);
 
 document.addEventListener('keydown', event => {
+  if (journeys.keydown(event)) return;
   if (!state.doc && matchesShortcut('reload-spec', event) && $('[data-action="restart"]')) { event.preventDefault(); start(); return; }
   if (!$('.workspace') || event.defaultPrevented || event.isComposing) return;
   const tab = event.target.closest?.('[role="tab"]');

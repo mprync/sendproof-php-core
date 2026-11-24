@@ -4,6 +4,7 @@
 // Chinese has a single plural category, so every plural entry carries only `other`.
 import capture from './zh-Hans-capture.js';
 import stores from './zh-Hans-stores.js';
+import journeys from './zh-Hans-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -13,6 +14,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': '然后',
     'unit.bytes': '{n} B',

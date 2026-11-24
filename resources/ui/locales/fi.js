@@ -4,6 +4,7 @@
 // attribuutti (attribute), parametri (parameter).
 import capture from './fi-capture.js';
 import stores from './fi-stores.js';
+import journeys from './fi-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -13,6 +14,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'sitten',
     'unit.bytes': '{n} t',

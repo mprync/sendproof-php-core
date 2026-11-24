@@ -2,6 +2,7 @@
 // Indonesian has no grammatical plural, so every plural entry carries only the `other` form.
 import capture from './id-capture.js';
 import stores from './id-stores.js';
+import journeys from './id-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -11,6 +12,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'lalu',
     'unit.bytes': '{n} B',

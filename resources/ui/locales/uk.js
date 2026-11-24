@@ -2,6 +2,7 @@
 // Plural entries use Intl.PluralRules('uk') categories: one, few, many, other (other is for fractions).
 import capture from './uk-capture.js';
 import stores from './uk-stores.js';
+import journeys from './uk-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -11,6 +12,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'потім',
     'unit.bytes': '{n} Б',

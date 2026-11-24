@@ -26,7 +26,7 @@ const CREDENTIAL = /authorization|cookie|password|passwd|secret|token|api[-_]?ke
 /** Execute requests and render the result pane. */
 export function createResults({
   state, basePath, $, readRequest, sensitiveNames, renderOperation, issues, onFollowUp, selectView,
-  schemaName = () => '', fillable = () => false, onCompleted = () => {},
+  schemaName = () => '', fillable = () => false, onCompleted = () => {}, journey = () => null, databaseExtra = () => '',
 }) {
   let active;
   let confirmation;
@@ -65,7 +65,11 @@ export function createResults({
       dock.innerHTML = previewDock(entry);
     }
     const blocked = state.result?.blocked && state.result.operation === state.op ? storeName(state.result.blocked.store) : undefined;
-    if (bar && !confirmation) bar.innerHTML = actionBar(state.op, previewAvailable(), { unavailable: entry, blocked });
+    // A journey step draws its own bar (mocks 134–137): its status, Run to end and Preview step N.
+    const hooks = journey();
+    bar?.classList?.toggle('j7-actions', !!hooks);
+    if (hooks && dock) dock.hidden = true;
+    if (bar && !confirmation) bar.innerHTML = hooks ? hooks.bar() : actionBar(state.op, previewAvailable(), { unavailable: entry, blocked });
   }
 
   /** Preview pressed (or ⌘↵) on an operation marked preview: false: point at the reason instead. */
@@ -184,6 +188,9 @@ export function createResults({
 
   async function run(preview, confirmed = false) {
     if (active) return;
+    // In a journey run a step carries its session, may Preview a GET inside it, and a Send run was
+    // confirmed once when it started (journeys.md, "Running a journey").
+    const hooks = journey()?.run?.(preview) ?? null;
     let controller;
     let started;
     let target;
@@ -197,9 +204,10 @@ export function createResults({
         cancelConfirmation();
         request = readRequest();
       }
-      if (preview && unavailable() && nudgeDock()) return;
-      if (preview && !previewAvailable()) throw new Error(t('res.previewUnavailable'));
-      if (!preview && !isReadOnly(state.op) && !confirmed) {
+      if (preview && !hooks?.allowPreview && unavailable() && nudgeDock()) return;
+      if (preview && !previewAvailable() && !hooks?.allowPreview) throw new Error(t('res.previewUnavailable'));
+      for (const [name, value] of Object.entries(hooks?.headers ?? {})) request.headers.set(name, value);
+      if (!preview && !isReadOnly(state.op) && !confirmed && !hooks?.skipConfirm) {
         issues?.clear();
         askForConfirmation(request);
         return;
@@ -226,7 +234,7 @@ export function createResults({
         if (elapsed) elapsed.textContent = formatDuration(performance.now() - started);
       }, 250);
       try {
-        const observedSend = !preview && previewAvailable() && tracedSendEnabled(state.cap);
+        const observedSend = !preview && (hooks?.observedSend ?? (previewAvailable() && tracedSendEnabled(state.cap)));
         const result = await execute(request, preview, basePath, controller.signal, { observedSend });
         if (active !== controller || state.op !== operation || state.documentUrl !== documentUrl) return;
         state.running = undefined;
@@ -248,6 +256,7 @@ export function createResults({
         if (result.status >= 400) showValidationErrors(result.body);
         if (state.resultTab !== 'Response' && !captured(result) && ['Database', 'Side effects', 'Logs'].includes(state.resultTab) && !rejectedEarly(result))
           state.resultTab = 'Response';
+        else if (hooks) state.resultTab = 'Expected';
         else if (preview && result.status < 400 && result.changes?.length) state.resultTab = 'Database';
         if (recordHistory) state.history.unshift({ op: operation, body, params, headers: draftHeaders, preview, when: Date.now(), status: result.status });
         state.history.length = Math.min(state.history.length, 50);
@@ -255,6 +264,7 @@ export function createResults({
         renderResult();
         if (result.blocked || preview) renderBar();
         setView('response');
+        hooks?.onResult?.(result, { preview, operation });
         onCompleted(result, { preview, operation });
       } finally {
         clearInterval(timer);
@@ -280,20 +290,28 @@ export function createResults({
         renderResult();
         setView('response');
       } else if (error.name !== 'AbortError' && (!controller || !controller.signal.aborted)) showError(error);
+      hooks?.onError?.(error);
     }
   }
 
   function renderTabs(result) {
     const counts = state.running ? resultCounts(null) : resultCounts(result);
-    $('.response .tabs').innerHTML = RESULT_TABS.map((tab, index) => tabButton(resultTabLabel(tab), {
-      selected: tab === state.resultTab, count: counts[index], id: `result-tab-${tab.replaceAll(' ', '-')}`,
-      controls: 'result', shortcut: 'result-tab-' + index, data: `data-result-tab="${tab}"`,
+    const expected = journey()?.expected;
+    // In a journey step Expected leads and keeps its count; the other tabs give up theirs (they're
+    // inside each tab) so all six fit the result pane at its default width (mock 134).
+    const tabs = expected ? ['Expected', ...RESULT_TABS] : RESULT_TABS;
+    $('.response .tabs').classList?.toggle('j7-rtabs', !!expected);
+    $('.response .tabs').innerHTML = tabs.map((tab, index) => tabButton(tab === 'Expected' ? expected.label : resultTabLabel(tab), {
+      selected: tab === state.resultTab, count: tab === 'Expected' ? expected.count : expected ? undefined : counts[index],
+      flag: tab === 'Expected' ? expected.flag : undefined, id: `result-tab-${tab.replaceAll(' ', '-')}`,
+      controls: 'result', shortcut: index < 5 ? 'result-tab-' + index : undefined, data: `data-result-tab="${tab}"`,
     })).join('');
     $('.response .tabs [aria-selected="true"]')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
   }
 
   /** The content of the selected tab for the current result. */
   function tabContent(tab, result, ctx) {
+    if (tab === 'Expected') return journey()?.expected?.render() ?? '';
     if (!result) return beforeRun(tab, ctx);
     if (result.network) return tab === 'Response' ? networkError(result) : beforeRun(tab, ctx);
     if (result.error) return tab === 'Response' ? requestError(result) : beforeRun(tab, ctx);
@@ -315,6 +333,8 @@ export function createResults({
   function renderResult() {
     const result = state.result;
     const head = $('.resp-head');
+    const hooks = journey();
+    if (state.resultTab === 'Expected' && !hooks?.expected) state.resultTab = 'Response';
     if (state.running) head.innerHTML = runningHeader(state.running.preview, state.cap.identity?.name);
     else if (result?.network) head.innerHTML = networkHeader(result);
     else if (result?.error) head.innerHTML = errorHeader();
@@ -322,24 +342,31 @@ export function createResults({
     else {
       // The schema match sits in the status line, after status, time and size (mock 100).
       const viewContext = { document: state.doc, operation: state.op, operations: state.ops, basePath, onFollowUp, capabilities: state.cap };
-      head.innerHTML = result ? responseHeader(result, { match: result.raw || result.body !== undefined ? matchButton(result, viewContext) : '' }) : idleHeader();
+      // A journey step's head is the mock's quiet one: the mode, status, time and size, Copy as cURL and Re-run.
+      head.innerHTML = result ? responseHeader(result, { match: !hooks?.plainHead && (result.raw || result.body !== undefined) ? matchButton(result, viewContext) : '', plain: !!hooks?.plainHead }) + (hooks?.headExtra?.() ?? '') : hooks?.idleHead?.() ?? idleHeader();
       if (result) bindMatch(head, result, viewContext);
     }
     renderTabs(result);
     const bar = $('.result-bar');
-    if (bar) bar.innerHTML = resultBar(result, { running: !!state.running, identity: state.cap.identity?.name });
+    if (bar) bar.innerHTML = hooks?.resultBar?.(result, { running: !!state.running }) ?? resultBar(result, { running: !!state.running, identity: state.cap.identity?.name });
     const panel = $('#result');
     const tab = state.resultTab;
     const wasBlocked = !!state.op && !!state.blockedOps?.[`${state.op.method} ${state.op.path}`];
-    if (state.running) panel.innerHTML = loadingBody(tab, state.running.preview, { blocked: state.running.preview && wasBlocked }) + `<span class="sr-only">${esc(t('res.loading'))}</span>`;
+    if (state.running) panel.innerHTML = (tab === 'Expected' && hooks?.expected?.loading ? hooks.expected.loading() : loadingBody(tab, state.running.preview, { blocked: state.running.preview && wasBlocked })) + `<span class="sr-only">${esc(t('res.loading'))}</span>`;
     else {
       panel.innerHTML = `<div class="result-body">${tabContent(tab, result, context())}</div>`;
       const container = panel.querySelector('.result-body');
       const viewContext = { document: state.doc, operation: state.op, operations: state.ops, basePath, onFollowUp, capabilities: state.cap };
-      if (result?.blocked && tab === 'Response') bindBlocked(container, result, context());
+      if (tab === 'Expected') hooks?.expected?.bind?.(container);
+      else if (result?.blocked && tab === 'Response') bindBlocked(container, result, context());
       else if (result?.blocked && tab !== 'Headers') { /* A designed state with no captured data to bind. */ }
       else if (result && !result.error && tab === 'Response') bindResponseViewer(container, result, viewContext);
-      else if (result && !result.error && tab === 'Database' && captured(result) && result.changes?.length) bindDatabase(container, result);
+      else if (result && !result.error && tab === 'Database' && captured(result) && result.changes?.length) {
+        // Copy as C# (journeys): this Preview's writes as an ExpectWrites block, in the banner.
+        const extra = databaseExtra();
+        if (extra) container.querySelector('.banner')?.insertAdjacentHTML('beforeend', `<div class="j7-banner-acts">${extra}</div>`);
+        bindDatabase(container, result);
+      }
       else if (result && !result.error && showsCapture(tab, result)) bindCapturePane(container, tab, result, viewContext);
     }
     panel.scrollTop = 0;

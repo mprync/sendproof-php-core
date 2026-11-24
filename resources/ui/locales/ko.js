@@ -3,6 +3,7 @@
 // send 전송, operation 작업, model 모델, property 속성, attribute 속성, parameter 매개변수.
 import capture from './ko-capture.js';
 import stores from './ko-stores.js';
+import journeys from './ko-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -12,6 +13,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': '그다음',
     'unit.bytes': '{n} B',

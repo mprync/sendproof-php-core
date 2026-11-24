@@ -105,7 +105,7 @@ function serverErrorPanel(failure) {
 }
 
 /** Render configured authentication providers and optional development personas. */
-export async function showSignIn(root, capabilities, onSignedIn, onCancel) {
+export async function showSignIn(root, capabilities, onSignedIn, onCancel, { confirmPersona } = {}) {
   const controller = new AbortController();
   let active = true;
   const providers = Array.isArray(capabilities.authProviders) ? capabilities.authProviders : [];
@@ -247,10 +247,13 @@ export async function showSignIn(root, capabilities, onSignedIn, onCancel) {
       if (!Array.isArray(users)) throw new Error(t('signin.accountsInvalid'));
       if (!active) return;
       container.innerHTML = users.map(personaMarkup).join('') || `<div class="persona-row"><span class="faint">${esc(t('signin.noAccounts'))}</span></div>`;
-      container.onclick = event => {
+      container.onclick = async event => {
         const button = event.target.closest('[data-persona]');
         const user = button && users[Number(button.dataset.persona)];
-        if (user?.email) signIn(`${personas.url.replace(/\/$/, '')}/${encodeURIComponent(user.email)}`, null, button);
+        if (!user?.email) return;
+        // Switching persona ends a held Preview session (journeys.js asks first); declining stays put.
+        if (confirmPersona && !(await confirmPersona(user))) return;
+        signIn(`${personas.url.replace(/\/$/, '')}/${encodeURIComponent(user.email)}`, null, button);
       };
     } catch (failure) {
       if (active) container.innerHTML = `<div class="persona-row" role="alert"><span style="color:var(--danger)">${esc(failure.message)}</span></div>`;

@@ -8,16 +8,23 @@
 //   #model/<Name>?from=docs/<operationId>&via=<Model>,<Model>
 //                                          a model opened from an operation (`from` is docs/… or
 //                                          op/…) or from a $ref followed through other models (`via`)
+//   #journeys                              Journeys mode, where it was left
+//   #journey/<workflowId>                  a journey's overview
+//   #journey/<workflowId>/step/<stepId>    a step of the open run, on its operation's own screen
+//   #journey/<workflowId>/run/<runId>      a run's summary
 //
 // Expanding a schema inline is not navigation and never changes the address.
 
 /**
  * @typedef {object} Route
- * @property {'overview'|'op'|'docs'|'model'} kind
+ * @property {'overview'|'op'|'docs'|'model'|'journeys'|'journey'|'jstep'|'jrun'} kind
  * @property {string} [id]     operation id (or "METHOD /path") for op and docs
  * @property {string} [name]   model name for model
  * @property {{kind: 'op'|'docs', id: string}} [from]  the operation a model was opened from
  * @property {string[]} [via]  models followed on the way, nearest to the operation first
+ * @property {string} [journey] workflowId for journey, jstep and jrun
+ * @property {string} [step]    stepId for jstep
+ * @property {string} [run]     runId for jrun
  */
 
 const OVERVIEW = Object.freeze({ kind: 'overview' });
@@ -33,6 +40,16 @@ export function parseRoute(hash) {
   let key = '';
   try { key = decodeURIComponent(slash < 0 ? '' : path.slice(slash + 1)); } catch { return OVERVIEW; }
   if ((kind === 'op' || kind === 'docs') && key) return { kind, id: key };
+  if (kind === 'journeys') return { kind: 'journeys' };
+  if (kind === 'journey' && key) {
+    let parts;
+    try { parts = path.slice(slash + 1).split('/').map(decodeURIComponent); } catch { return OVERVIEW; }
+    const [journey, sub, value] = parts;
+    if (sub === 'step' && value) return { kind: 'jstep', journey, step: value };
+    if (sub === 'run' && value) return { kind: 'jrun', journey, run: value };
+    if (journey && !sub) return { kind: 'journey', journey };
+    return OVERVIEW;
+  }
   if (kind === 'model' && key) {
     const route = { kind, name: key };
     const from = /^(op|docs)\/(.+)$/.exec(query.get('from') ?? '');
@@ -48,12 +65,19 @@ export function parseRoute(hash) {
 export function formatRoute(route) {
   const encode = encodeURIComponent;
   if (route.kind === 'op' || route.kind === 'docs') return `#${route.kind}/${encode(route.id)}`;
+  if (route.kind === 'journeys') return '#journeys';
+  if (route.kind === 'journey') return `#journey/${encode(route.journey)}`;
+  if (route.kind === 'jstep') return `#journey/${encode(route.journey)}/step/${encode(route.step)}`;
+  if (route.kind === 'jrun') return `#journey/${encode(route.journey)}/run/${encode(route.run)}`;
   if (route.kind !== 'model') return '#overview';
   const query = [];
   if (route.from) query.push(`from=${route.from.kind}/${encode(route.from.id)}`);
   if (route.via?.length) query.push(`via=${route.via.map(encode).join(',')}`);
   return `#model/${encode(route.name)}${query.length ? '?' + query.join('&') : ''}`;
 }
+
+/** True for the routes of Journeys mode. */
+export const isJourneyRoute = route => ['journeys', 'journey', 'jstep', 'jrun'].includes(route?.kind);
 
 /** Whether two routes are the same page. */
 export const sameRoute = (a, b) => formatRoute(a) === formatRoute(b);

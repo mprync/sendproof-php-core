@@ -4,6 +4,7 @@
 // operation, modell, egenskap (property), attribut (attribute), parameter.
 import capture from './sv-capture.js';
 import stores from './sv-stores.js';
+import journeys from './sv-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -13,6 +14,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'sedan',
     'unit.bytes': '{n} B',

@@ -224,7 +224,8 @@ export async function execute(request, preview, basePath, signal, { observedSend
       };
     }
     if (!response.ok || body?.rolledBack !== true || !Number.isInteger(body.status)) {
-      throw new Error('Preview was not acknowledged as rolled back (HTTP ' + response.status + '). ' + (body?.title || ''));
+      // The problem's `code` (session_not_found, session_failed…) says why, so a run can tell an ended session from a failed step.
+      throw Object.assign(new Error('Preview was not acknowledged as rolled back (HTTP ' + response.status + '). ' + (body?.title || '')), { status: response.status, code: typeof body?.code === 'string' ? body.code : undefined });
     }
     const type = Object.entries(body.headers || {}).find(([name]) => name.toLowerCase() === 'content-type')?.[1] || '';
     const content = body.body == null ? '' :

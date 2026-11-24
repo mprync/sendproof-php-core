@@ -1,5 +1,6 @@
 // A small, safe CommonMark subset for OpenAPI descriptions: paragraphs, bullet and numbered
-// lists, headings, **bold**, *emphasis*, `code` and http(s) links. Everything else is escaped.
+// lists, headings, GitHub tables, **bold**, *emphasis*, `code` and http(s) links. Everything else
+// is escaped.
 import { esc } from './components.js';
 
 /** Inline markup only, for one-line descriptions. */
@@ -11,11 +12,35 @@ export function inline(text) {
     .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a class="link" href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
 }
 
-/** Block markup: paragraphs, lists and headings. */
+/** A table's delimiter row, such as `| --- | :---: |`. */
+const DELIMITER = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
+
+/** A table row's cells: outer pipes dropped, split on pipes that aren't escaped (`\|`). */
+function cells(line) {
+  const row = line.trim().replace(/^\|/, '').replace(/(^|[^\\])\|$/, '$1');
+  return row.split(/(?<!\\)\|/).map(cell => cell.trim().replace(/\\\|/g, '|'));
+}
+
+/** A GitHub table: header, delimiter row (which sets each column's alignment) and body rows. */
+function table(lines) {
+  const head = cells(lines[0]);
+  const align = cells(lines[1]).map(cell => cell.startsWith(':') && cell.endsWith(':') ? 'center' : cell.endsWith(':') ? 'end' : '');
+  const cell = (tag, text, index) => `<${tag}${align[index] ? ` style="text-align:${align[index]}"` : ''}>${inline(text ?? '')}</${tag}>`;
+  const body = lines.slice(2).map(line => { const row = cells(line); return `<tr>${head.map((_, index) => cell('td', row[index], index)).join('')}</tr>`; }).join('');
+  return `<div class="md-table"><table><thead><tr>${head.map((text, index) => cell('th', text, index)).join('')}</tr></thead>${body ? `<tbody>${body}</tbody>` : ''}</table></div>`;
+}
+
+/** Block markup: paragraphs, lists, headings and tables. */
 export function markdown(text) {
   const blocks = String(text ?? '').replace(/\r\n/g, '\n').trim().split(/\n\s*\n/);
   return blocks.map(block => {
     const lines = block.split('\n');
+    // A table may follow a paragraph's lines without a blank line between them.
+    const delimiter = lines.findIndex((line, index) => index > 0 && line.includes('-') && DELIMITER.test(line) && lines[index - 1].includes('|'));
+    if (delimiter > 0) {
+      const before = lines.slice(0, delimiter - 1);
+      return `${before.length ? `<p>${before.map(inline).join(' ')}</p>` : ''}${table(lines.slice(delimiter - 1))}`;
+    }
     if (lines.every(line => /^\s*[-*+]\s+/.test(line))) return `<ul>${lines.map(line => `<li>${inline(line.replace(/^\s*[-*+]\s+/, ''))}</li>`).join('')}</ul>`;
     if (lines.every(line => /^\s*\d+[.)]\s+/.test(line))) return `<ol>${lines.map(line => `<li>${inline(line.replace(/^\s*\d+[.)]\s+/, ''))}</li>`).join('')}</ol>`;
     const heading = /^(#{1,6})\s+(.*)$/.exec(lines[0]);

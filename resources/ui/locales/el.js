@@ -1,6 +1,7 @@
 // Greek UI strings. Missing keys fall back to English (en.js).
 import capture from './el-capture.js';
 import stores from './el-stores.js';
+import journeys from './el-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -10,6 +11,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'μετά',
     'unit.bytes': '{n} B',

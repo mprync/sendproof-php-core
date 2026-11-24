@@ -2,6 +2,7 @@
 // Turkish uses the singular noun after a numeral, so plural entries carry the same text in "one" and "other".
 import capture from './tr-capture.js';
 import stores from './tr-stores.js';
+import journeys from './tr-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -11,6 +12,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'sonra',
     'unit.bytes': '{n} B',

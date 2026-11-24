@@ -22,6 +22,12 @@ export const SHORTCUTS = {
   'sidebar-operations': { group: 'Navigate', sequence: ['G', 'O'], icon: 'list' },
   'sidebar-models': { group: 'Navigate', sequence: ['G', 'M'], icon: 'box' },
   'goto-operation': { group: 'Navigate', icon: 'search' },
+  // Journeys mode (v7): the mode switch, and moving between a run's steps.
+  'mode-spec': { group: 'Navigate', sequence: ['G', 'S'], icon: 'braces', journeys: true },
+  'mode-journeys': { group: 'Navigate', sequence: ['G', 'J'], icon: 'route', journeys: true },
+  'step-previous': { group: 'Navigate', chord: '[', journeys: true },
+  'step-next': { group: 'Navigate', chord: ']', journeys: true },
+  'run-to-end': { group: 'Request', chord: keys('Mod', 'Alt', 'Enter'), icon: 'forward', journeys: true },
   docs: { group: 'Navigate', chord: 'D', icon: 'book' },
   'model-back': { group: 'Navigate', chord: keys('Alt', 'ArrowLeft'), icon: 'arrow-left' },
   'focus-pane': { group: 'Navigate', chord: keys('Mod', '[') },

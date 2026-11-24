@@ -1,3 +1,5 @@
+import { localizeDateTimes } from '../i18n.js';
+
 const read = (item, key) => item && Object.hasOwn(item, key) ? item[key] : undefined;
 
 /** Resolve lookup URLs within the mounted application and use the current user's session. */
@@ -18,8 +20,9 @@ export function lookupOption(metadata, item) {
   if (value === undefined || value === null || typeof value === 'object') return undefined;
   return {
     value,
-    label: String(read(item, metadata.labelField || 'name') ?? value),
-    detail: read(item, metadata.detailField || 'detail'),
+    // An ISO date-time in a name or detail reads as a local short date-time; the value is untouched.
+    label: localizeDateTimes(read(item, metadata.labelField || 'name') ?? value),
+    detail: ((detail) => typeof detail === 'string' ? localizeDateTimes(detail) : detail)(read(item, metadata.detailField || 'detail')),
     status: read(item, metadata.statusField || 'status'),
     // A short code at the end of the row, such as the account's currency.
     end: typeof read(item, metadata.endField || 'currency') === 'string' ? read(item, metadata.endField || 'currency') : undefined,

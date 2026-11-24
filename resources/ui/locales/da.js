@@ -3,6 +3,7 @@
 // forhåndsvisning (preview), operation, model, egenskab (property), attribut (attribute), parameter.
 import capture from './da-capture.js';
 import stores from './da-stores.js';
+import journeys from './da-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -12,6 +13,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'derefter',
     'unit.bytes': '{n} B',

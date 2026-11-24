@@ -516,10 +516,16 @@ fieldset { border: 0; padding: 0; margin: 0; min-inline-size: 0; }
 .param-holder[data-half] > div > .field { grid-column: auto; }
 .param-holder[data-half="start"] > div > .field { grid-column: 1; }
 .field { display: grid; grid-template-rows: auto auto auto auto; row-gap: 0; min-inline-size: 0; padding-block-end: 0.75rem; }
+/* A label never gets squeezed below its text: the chips beside it give way first, the type, then
+   "optional", then the Fixed or bound chip (Clear, an action, stays). */
 .label { display: flex; align-items: center; gap: 0.375rem; min-inline-size: 0; min-block-size: 1.5rem; margin-block-end: 0.375rem; font-size: var(--fs-base); font-weight: 500; }
-.label .name { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.label .name { flex: 0 0 auto; max-inline-size: 100%; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.label > :is(.opt, .bind7) { flex: 0 1 auto; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.label > .opt { flex-shrink: 4; }
 .label .opt { font-weight: 400; color: var(--text-3); font-size: var(--fs-sm); }
-.label .end { margin-inline-start: auto; display: flex; align-items: center; gap: 0.625rem; flex: none; }
+.label .end { margin-inline-start: auto; display: flex; align-items: center; gap: 0.625rem; flex: 0 1 auto; min-inline-size: 0; }
+.label .end > * { flex: none; }
+.label .end > .type { flex: 0 10 auto; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
 .label .type { font: 400 var(--fs-sm)/1 var(--mono); color: var(--text-3); white-space: nowrap; direction: ltr; }
 .field-clear { block-size: 1.5rem; padding-inline: 0.3125rem; margin-inline: -0.3125rem 0; border: 0; border-radius: var(--r-sm); background: none; color: var(--accent-text); font: 500 var(--fs-sm)/1 var(--font); cursor: pointer; }
 .field-clear:hover { background: var(--accent-soft); }

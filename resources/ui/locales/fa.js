@@ -2,6 +2,7 @@
 // Persian has two plural categories (one, other); Intl.PluralRules picks the right one.
 import capture from './fa-capture.js';
 import stores from './fa-stores.js';
+import journeys from './fa-journeys.js';
 
 export default {
   dir: 'rtl',
@@ -11,6 +12,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'سپس',
     'unit.bytes': '{n} B',

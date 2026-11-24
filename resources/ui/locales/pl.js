@@ -4,6 +4,7 @@
 // preview = podgląd, send = wyślij, operation = operacja, property = właściwość, attribute = atrybut.
 import capture from './pl-capture.js';
 import stores from './pl-stores.js';
+import journeys from './pl-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -13,6 +14,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'potem',
     'unit.bytes': '{n} B',

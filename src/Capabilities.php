@@ -65,6 +65,7 @@ final class Capabilities
         return $capabilities + [
             'apiName' => $apiName,
             'environment' => $environment,
+            'previewSessions' => false,
             'database' => $databaseEntry,
             'identity' => $identity,
             'authProviders' => $authProviders,

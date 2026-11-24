@@ -183,8 +183,8 @@ export const formatDecimal = (n, digits = 2) =>
   formatNumber(n, { minimumFractionDigits: digits, maximumFractionDigits: digits });
 export const formatMoney = (n, currency = 'EUR') => formatNumber(n, { style: 'currency', currency });
 /** Units in the locale's short form, such as "84 ms" or "1.2 kB". */
-export const formatUnit = (n, unit, digits = 0) =>
-  formatNumber(n, { style: 'unit', unit, unitDisplay: 'short', maximumFractionDigits: digits });
+export const formatUnit = (n, unit, digits = 0, display = 'short') =>
+  formatNumber(n, { style: 'unit', unit, unitDisplay: display, maximumFractionDigits: digits });
 /** Bytes as B, kB or MB in the locale's short form. */
 export function formatBytes(bytes) {
   // Intl spells out "byte"; the short symbol B reads better next to kB.
@@ -204,6 +204,17 @@ export const formatTime = value =>
   new Intl.DateTimeFormat(active.locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(value));
 export const formatDateTime = value =>
   new Intl.DateTimeFormat(active.locale, { dateStyle: 'medium', timeStyle: 'medium' }).format(new Date(value));
+/** Items strung together without "and": "7 rows, 3 documents, 1 email". */
+export const formatCommaList = items =>
+  new Intl.ListFormat(active.locale, { style: 'short', type: 'unit' }).format(items.map(String));
+export const formatShortDateTime = value =>
+  new Intl.DateTimeFormat(active.locale, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+const ISO_DATE_TIME = /\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})\b/g;
+/** Text with each ISO 8601 date-time (with a zone, as an API sends it) shown as a local short date-time. */
+export const localizeDateTimes = text => String(text ?? '').replace(ISO_DATE_TIME, match => {
+  const time = new Date(match);
+  return Number.isNaN(time.getTime()) ? match : formatShortDateTime(time);
+});
 export const formatList = (items, type = 'conjunction') =>
   new Intl.ListFormat(active.locale, { style: 'long', type }).format(items.map(String));
 export const formatRelativeDays = days =>

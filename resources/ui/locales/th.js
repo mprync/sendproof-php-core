@@ -2,6 +2,7 @@
 // Thai has a single plural category ("other"), so plural entries carry only that form.
 import capture from './th-capture.js';
 import stores from './th-stores.js';
+import journeys from './th-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -11,6 +12,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'แล้ว',
     'unit.bytes': '{n} B',

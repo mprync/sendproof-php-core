@@ -57,8 +57,8 @@ export function loadNavState(storage, documentUrl) {
   try {
     const value = JSON.parse(storage?.getItem(navStorageKey(documentUrl)) || 'null');
     const clean = source => Object.fromEntries(Object.entries(source && typeof source === 'object' ? source : {}).filter(([, flag]) => typeof flag === 'boolean'));
-    return { ops: clean(value?.ops), models: clean(value?.models) };
-  } catch { return { ops: {}, models: {} }; }
+    return { ops: clean(value?.ops), models: clean(value?.models), journeys: clean(value?.journeys) };
+  } catch { return { ops: {}, models: {}, journeys: {} }; }
 }
 
 /** Writes the remembered group state; storage that is full or blocked is ignored. */
@@ -77,9 +77,9 @@ export function operationGroups(ops, document) {
 }
 
 /** Sidebar rendering and its small amount of state. */
-export function createSidebar({ state, $, storage = globalThis.localStorage }) {
+export function createSidebar({ state, $, storage = globalThis.localStorage, journeys }) {
   let tab = 'operations';
-  let nav = { ops: {}, models: {} };
+  let nav = { ops: {}, models: {}, journeys: {} };
   let loadedFor;
 
   bindDeprecationTips();
@@ -198,10 +198,51 @@ export function createSidebar({ state, $, storage = globalThis.localStorage }) {
       <button type="button" class="btn btn-ghost btn-xs" data-action="toggle-groups" title="${esc(t(everyGroupClosed ? 'side.expandAll' : 'side.collapseAll'))}">${icon('chevrons-ud', true)}<span class="lbl">${esc(t(everyGroupClosed ? 'side.expandAll' : 'side.collapseAll'))}</span></button>`;
   }
 
+  /**
+   * Journeys mode (mocks v7): the head row in place of the tabs, the journeys list with the open
+   * run's rail, and Run all and Collapse all in the bar. `journeys` (from journeys.js) draws them.
+   */
+  function renderJourneys(query) {
+    const tabs = $('.sidebar .tabs');
+    const head = $('[data-journeys-head]');
+    if (tabs) tabs.hidden = true;
+    if (head) { head.hidden = false; head.innerHTML = journeys.head(); }
+    const noticeSlot = $('[data-auth-notice]');
+    if (noticeSlot) noticeSlot.hidden = true;
+    const input = $('#filter');
+    const placeholder = t('jr.filter');
+    if (input) { input.placeholder = placeholder; input.disabled = !journeys.filterable(); }
+    const label = $('[data-filter-label]');
+    if (label) label.textContent = placeholder;
+    const end = $('[data-filter-end]');
+    if (end) end.innerHTML = query
+      ? `<button type="button" class="btn btn-ghost btn-icon btn-xs" data-action="clear-filter" aria-label="${esc(t('side.clearFilter'))}">${icon('x', true)}</button>`
+      : shortcutHint('filter');
+    const list = $('.nav');
+    list.removeAttribute('aria-labelledby');
+    list.setAttribute('aria-label', t('jr.mode.journeys'));
+    list.removeAttribute('role');
+    const scroll = list.scrollTop;
+    list.innerHTML = journeys.list(query, key => isCollapsed('journeys', key)) || (query ? noMatch(query, journeys.names()) : '');
+    list.scrollTop = scroll;
+    $('.side-bar').innerHTML = journeys.foot(keys => keys.every(key => isCollapsed('journeys', key)));
+  }
+
   /** Re-renders the tabs' counts, the notice, the filter's end slot, the list and the foot bar. */
   function render() {
     const input = $('#filter');
     const query = (input?.value || '').trim().toLowerCase();
+    if (journeys?.active()) { renderJourneys(query); return; }
+    const tabsRow = $('.sidebar .tabs');
+    if (tabsRow?.hidden) {
+      tabsRow.hidden = false;
+      const head = $('[data-journeys-head]');
+      if (head) head.hidden = true;
+      if (input) input.disabled = false;
+      const list = $('.nav');
+      list.removeAttribute('aria-label');
+      list.setAttribute('role', 'tabpanel');
+    }
     for (const button of document.querySelectorAll('[data-side-tab]')) {
       const selected = button.dataset.sideTab === tab;
       button.setAttribute('aria-selected', String(selected));
@@ -247,11 +288,19 @@ export function createSidebar({ state, $, storage = globalThis.localStorage }) {
     list.hidden = !expand;
     heading.setAttribute('aria-expanded', String(expand));
     heading.querySelector('use').setAttribute('href', expand ? '#i-chevron-down' : '#i-chevron-right');
-    if (heading.dataset.groupKind === 'ops') render();
+    if (heading.dataset.groupKind === 'ops' || heading.dataset.groupKind === 'journeys') render();
   }
 
   /** Collapses every operation group, or opens them all when they are all collapsed. */
   function toggleAll() {
+    if (journeys?.active()) {
+      const keys = journeys.groupKeys();
+      const collapse = !keys.every(key => isCollapsed('journeys', key));
+      for (const key of keys) remember('journeys', key, collapse);
+      render();
+      $('[data-action="toggle-groups"]')?.focus();
+      return;
+    }
     const collapse = !groups().every(([name]) => isCollapsed('ops', name));
     for (const [name] of groups()) remember('ops', name, collapse);
     render();

@@ -36,7 +36,9 @@ export function showShortcuts(overlay) {
   const input = overlay.querySelector('input');
   const dismiss = overlay.querySelector('.dialog-head button');
   const body = overlay.querySelector('.dialog-body');
-  const all = Object.entries(SHORTCUTS).filter(([, definition]) => definition.group && (definition.chord || definition.sequence));
+  // Journeys shortcuts are listed only where Journeys mode exists (the mode switch is drawn).
+  const journeys = !!document.querySelector('[data-mode]');
+  const all = Object.entries(SHORTCUTS).filter(([, definition]) => definition.group && (definition.chord || definition.sequence) && (!definition.journeys || journeys));
   if (app) app.inert = true;
 
   function render() {

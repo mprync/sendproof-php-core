@@ -4,6 +4,7 @@
 // Mục dạng số nhiều chỉ có dạng `other` vì tiếng Việt không chia số nhiều.
 import capture from './vi-capture.js';
 import stores from './vi-stores.js';
+import journeys from './vi-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -13,6 +14,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'rồi',
     'unit.bytes': '{n} B',

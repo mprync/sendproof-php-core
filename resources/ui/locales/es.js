@@ -4,6 +4,7 @@
 // iniciar sesión, vista previa, enviar. Informal "tú" imperative; quotes are « ».
 import capture from './es-capture.js';
 import stores from './es-stores.js';
+import journeys from './es-journeys.js';
 
 const p = (one, other) => ({ one, many: other, other });
 
@@ -15,6 +16,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'luego',
     'unit.bytes': '{n} B',

@@ -384,6 +384,15 @@ button.link { border: 0; background: none; padding: 0; font: inherit; color: var
 .sidebar .tabs { container: side-tabs / inline-size; }
 .sidebar .tab .n { flex: none; }
 :root:not(:lang(en)) .sidebar .tab { min-inline-size: max-content; padding-inline: 0; }
+/* Two tabs with a three-digit count need about 14.5rem at the default size ("Operations 101" and
+   "Models 101"), so below 15rem of tab row their side padding goes first, and below 11rem the
+   counts go too (each tab keeps its title and the count is in the list below). */
+@container side-tabs (max-width: 15rem) {
+  .sidebar .tab { padding-inline: 0; }
+}
+@container side-tabs (max-width: 11rem) {
+  .sidebar .tab .n { display: none; }
+}
 @container side-tabs (max-width: 13rem) {
   .sidebar .tab { padding-inline: 0; }
   :root:not(:lang(en)) .sidebar .tab { min-inline-size: 0; }
@@ -467,8 +476,15 @@ button.link { border: 0; background: none; padding: 0; font: inherit; color: var
   .topbar .persona { flex: 0 1 auto; min-inline-size: 0; }
   .topbar .persona .name { min-inline-size: 2.5rem; overflow: hidden; text-overflow: ellipsis; }
 }
+/* With the Specification | Journeys switch in the bar, nothing but the search label may give way:
+   below 1440 px the label is visually hidden (the button keeps its name, title and the shortcut) so
+   the API name, environment, database and the user's name never truncate at 1280 px. */
+@media (min-width: 56.0625rem) and (max-width: 89.9375rem) {
+  .topbar .search-trigger { inline-size: auto; flex: none; min-inline-size: 0; }
+  .topbar .search-trigger .grow { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
 
-/* =====================================================================
+/* ====================================================================
    Data stores (spec/data-stores.md; mocks v6.css, screens 113–131 and m26–m31).
    Workbench-only, like the rest of app.css. Logical properties throughout, so every rule mirrors right to left; data
    (keys, values, commands, store ids) stays left to right through .ltr.
@@ -846,3 +862,598 @@ button.env:hover { border-color: var(--line-strong); background: var(--hover); }
 .op-meta .sc-warn { color: var(--warn); }
 .op-meta .sc-danger { color: var(--danger); }
 .op-meta .sc-muted { color: var(--text-3); }
+
+/* =====================================================================
+   Journeys mode (docs/plans/journeys.md; mocks v7.css, screens 132–151 and m32–m40). The approved
+   v7 rules, unscoped, with the mocks' v6 class names mapped to the workbench's (sg6 → sg, cov6 →
+   cov, blk6 → blk, j6-s → tok-s, f5-status → field-hint). Colour carries one meaning each: green
+   matched or passed, red a problem, blue (info) a difference an approved-difference record covers,
+   the accent the current step and Preview.
+   ===================================================================== */
+.lg-ico { display: inline-flex; inline-size: 1rem; justify-content: center; color: var(--text-3); }
+/* ---------- Sidebar: the Journeys tab ---------- */
+:root:lang(ar) { --j7-exp: "المتوقَّع"; --j7-wr: "المكتوب"; }
+.j7-side .tabs { gap: 0; }
+.j7-side .tab { padding-inline: 0.5rem; }
+.jn7 { gap: 0.5rem; }
+.jn7-n { inline-size: 1.5rem; block-size: 1.25rem; display: grid; place-items: center; flex: none; border-radius: var(--r-sm); background: var(--sunken); border: 1px solid var(--line); color: var(--text-2); font: 600 var(--fs-xs)/1 var(--mono); font-variant-numeric: tabular-nums; }
+.jn7[aria-current="page"] .jn7-n { background: var(--raised); border-color: var(--line-strong); color: var(--text); }
+.jn7-tag { font: 500 0.625rem/1 var(--mono); padding: 0.1875rem 0.3125rem; border-radius: 999px; border: 1px solid var(--line); color: var(--text-3); }
+.lr7 { display: flex; }
+.lr7.is-ok { color: var(--ok); }
+.lr7.is-danger { color: var(--danger); }
+.lr7.is-muted { color: var(--text-3); opacity: 0.8; }
+.lr7.is-warn { color: var(--warn); }
+.j7-inferred { margin-block-start: 0.75rem !important; padding-block-start: 0.375rem; border-block-start: 1px dashed var(--line-strong); }
+.j7-inferred .jn7-n { border-style: dashed; background: none; }
+
+/* The progress rail: the open journey's steps, a connector through the nodes. The node's centre
+   sits under the step-count box's centre (item padding 0.5rem + half the 1.5rem box). */
+.rail7 { list-style: none; margin: 0.125rem 0 0.5rem; padding: 0; }
+.r7 { position: relative; }
+.r7 + .r7::before { content: ""; position: absolute; inset-inline-start: calc(1.25rem - 0.5px); inset-block-start: -0.5rem; block-size: 0.875rem; inline-size: 1px; background: var(--line-strong); }
+.r7.is-done + .r7::before { background: color-mix(in oklch, var(--ok) 55%, var(--line)); }
+.r7-link { display: grid; grid-template-columns: 1.25rem minmax(0, 1fr); gap: 0.625rem; align-items: start; padding: 0.375rem 0.5rem 0.375rem 0.625rem; border-radius: var(--r); color: var(--text-2); text-decoration: none; }
+[dir="rtl"] .r7-link { padding: 0.375rem 0.625rem 0.375rem 0.5rem; }
+.r7-link:hover { background: var(--hover); color: var(--text); }
+.r7-link[aria-current] { background: color-mix(in oklch, var(--accent-soft) 70%, transparent); color: var(--text); }
+.r7-node { inline-size: 1.25rem; block-size: 1.25rem; border-radius: 50%; display: grid; place-items: center; margin-block-start: 0.0625rem; font: 600 0.65625rem/1 var(--mono); background: var(--panel); border: 1px solid var(--line-strong); color: var(--text-3); position: relative; z-index: 1; }
+.r7-node .i { inline-size: 0.75rem; block-size: 0.75rem; stroke-width: 2.4; }
+.r7.is-done .r7-node { background: var(--ok-soft); border-color: color-mix(in oklch, var(--ok) 45%, transparent); color: var(--ok); }
+.r7.is-current .r7-node { background: var(--accent); border-color: var(--accent); color: var(--on-accent); box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 20%, transparent); }
+.r7:is(.is-fail, .is-refused) .r7-node { background: var(--danger-soft); border-color: color-mix(in oklch, var(--danger) 50%, transparent); color: var(--danger); }
+.r7.is-skipped .r7-node { border-style: dashed; }
+.r7-text { display: grid; min-inline-size: 0; }
+.r7-name { font-size: var(--fs-md); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.35; }
+.r7.is-skipped .r7-name, .r7.is-pending .r7-name { color: var(--text-3); font-weight: 400; }
+.r7-sub { font-size: var(--fs-xs); color: var(--text-3); line-height: 1.4; font-variant-numeric: tabular-nums; }
+.r7-bad { color: var(--danger); font-weight: 500; }
+.r7-ad { color: var(--info); font-weight: 500; }
+.r7.is-current .r7-sub { color: var(--accent-text); }
+
+/* Skeleton rows share the real rows' geometry, so nothing moves when they load. */
+.j7-sk { pointer-events: none; }
+.j7-sk-box { inline-size: 1.5rem; block-size: 1.25rem; flex: none; }
+.j7-sk-dot { inline-size: 0.875rem; block-size: 0.875rem; border-radius: 50%; margin-inline-start: auto; flex: none; }
+.j7-sk-h { pointer-events: none; }
+.j7-sk-title { block-size: 1.25rem; margin-block: 0.25rem 0.75rem; }
+.j7-skel .sk-line + .sk-line { margin-block-start: 0.5rem; }
+.j7-sk-pill { display: inline-block; block-size: 1.5rem; border-radius: 999px; }
+.j7-sk-fields { display: flex; flex-wrap: wrap; gap: var(--gap) 4%; }
+.j7-sk-field { display: grid; gap: 0.5rem; }
+.j7-sk-control { block-size: var(--control-h); border-radius: var(--r); }
+
+/* ---------- Main column ---------- */
+.j7-head { padding-block-end: 0.25rem; }
+.j7-body { padding: 0.5rem var(--pad) 2rem; display: block; }
+.j7-sl { margin: 1.5rem 0 0.875rem; font-size: inherit; }
+.j7-sl:first-child { margin-block-start: 1rem; }
+.j7-sl > span:first-child { flex: none; }
+.j7-sl-end { flex: none; font-size: var(--fs-sm); font-weight: 400; color: var(--text-3); display: inline-flex; align-items: center; gap: 0.3rem; text-transform: none; letter-spacing: 0; }
+.j7-sl-end.is-warn { color: var(--warn); font-weight: 500; }
+.j7-stores { gap: 0.3rem; }
+.j7-stores svg + * , .j7-stores > svg:not(:first-child) { margin-inline-start: 0.25rem; }
+
+/* Steps of a journey: a node, the operation, its bindings, then what it should do. */
+/* Steps as a timeline: numbered nodes on one connector, the step's name and what it should do on
+   the first line, the endpoint on the second, where its values come from on the third. */
+.js7 { list-style: none; margin: 0; padding: 0; display: grid; }
+.js7-step { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr); gap: 0.875rem; align-items: start; padding-block: 0 1.25rem; position: relative; }
+.js7-step:last-child { padding-block-end: 0.25rem; }
+.js7-step:not(:last-child)::before { content: ""; position: absolute; inset-inline-start: calc(0.75rem - 0.5px); inset-block: 1.75rem 0.25rem; inline-size: 1px; background: var(--line-strong); }
+.js7-node { inline-size: 1.5rem; block-size: 1.5rem; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-strong); background: var(--raised); font: 600 var(--fs-xs)/1 var(--mono); color: var(--text-2); box-shadow: var(--shadow-sm); }
+.js7-main { display: grid; gap: 0.3125rem; min-inline-size: 0; padding-block-start: 0.125rem; }
+.js7-l1 { display: flex; align-items: baseline; gap: 0.75rem; min-inline-size: 0; }
+.js7-op { font-weight: 600; color: var(--text); text-decoration: none; letter-spacing: -0.005em; }
+.js7-op:hover { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--line-strong); }
+.js7-sum { margin-inline-start: auto; display: inline-flex; align-items: baseline; gap: 0.5rem; font-size: var(--fs-sm); color: var(--text-3); white-space: nowrap; }
+.js7-sum code { font-size: var(--fs-xs); color: var(--text-2); background: none; padding: 0; }
+.js7-sum code::after { content: "·"; margin-inline-start: 0.5rem; color: var(--text-3); font-family: var(--font); }
+.js7-l2 { display: flex; align-items: center; gap: 0.5rem; min-inline-size: 0; }
+.js7-l2 .method { transform: scale(0.92); transform-origin: left center; }
+[dir="rtl"] .js7-l2 .method { transform-origin: right center; }
+.js7-path { font-size: var(--fs-sm); color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-inline-size: 0; background: none; padding: 0; }
+.js7-l3 { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.js7-l3:empty { display: none; }
+.js7-b { display: inline-flex; align-items: center; gap: 0.3125rem; block-size: 1.375rem; padding-inline: 0.4375rem; border-radius: var(--r-sm); background: var(--accent-soft); color: var(--accent-text); font-size: var(--fs-xs); white-space: nowrap; }
+.js7-b code { font-size: inherit; background: none; padding: 0; color: inherit; font-weight: 500; }
+.js7-b .js7-from { opacity: 0.85; }
+.js7-b.is-in { background: var(--sunken); color: var(--text-2); box-shadow: inset 0 0 0 1px var(--line); }
+.js7-b.is-crit { background: var(--ok-soft); color: var(--ok); }
+.js7-reads, .js7-writes { display: inline-flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+.j7-ends p { margin: 0 0 0.75rem; color: var(--text-2); }
+.j7-ends code, .j7-outs code { font-size: var(--fs-sm); }
+.j7-outs { margin: 0; }
+.j7-outs div { display: flex; gap: 0.75rem; align-items: baseline; }
+.j7-outs dt { color: var(--text-3); font-size: var(--fs-sm); }
+.j7-outs dd { margin: 0; display: flex; flex-wrap: wrap; gap: 0.375rem; }
+
+/* The step strip: which step, the run's mode, then one segment per step. */
+.sh7 { flex: none; display: grid; gap: 0.5rem; padding: 0.625rem var(--pad) 0.75rem; border-block-end: 1px solid var(--line); background: var(--panel); }
+.sh7-top { display: flex; align-items: center; gap: 0.625rem; row-gap: 0.25rem; min-inline-size: 0; }
+/* One row on desktop: the note gives way with an ellipsis (its full text is its title), so the end
+   button never drops to a line of its own. A phone puts the note on its own row instead. */
+.sh7-top > :not(.sh7-note) { flex: none; }
+.sh7-note > span:last-child { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sh7-step { font-size: var(--fs-md); font-weight: 600; white-space: nowrap; }
+.sh7-note { display: inline-flex; align-items: center; gap: 0.375rem; font-size: var(--fs-sm); color: var(--text-3); min-inline-size: 0; }
+.sh7-note code { font-size: var(--fs-xs); }
+.sh7-bar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.25rem; }
+.sh7-seg { block-size: 0.25rem; border-radius: 999px; background: var(--line); }
+.sh7-seg.is-done { background: var(--ok); }
+.sh7-seg.is-current { background: var(--accent); }
+.sh7-seg:is(.is-fail, .is-refused) { background: var(--danger); }
+.sh7-seg.is-skipped { background: repeating-linear-gradient(90deg, var(--line-strong) 0 0.25rem, transparent 0.25rem 0.5rem); }
+.j7-pill-send { color: var(--text); background: var(--sunken); }
+.j7-stepnav { display: flex; gap: 0.125rem; }
+
+/* Bound fields: a chip in the label row says where the value came from. */
+.bind7 { display: inline-flex; align-items: center; gap: 0.3rem; block-size: 1.25rem; padding-inline: 0.375rem; border-radius: var(--r-sm); background: var(--accent-soft); color: var(--accent-text); font-size: var(--fs-xs); font-weight: 500; white-space: nowrap; margin-inline-start: 0.25rem; }
+.bind7 code { font-size: inherit; background: none; padding: 0; color: inherit; }
+.bind7.is-in { background: var(--sunken); color: var(--text-2); border: 1px solid var(--line); }
+.bind7.is-fixed { background: none; color: var(--text-3); border: 1px dashed var(--line-strong); }
+[data-bound] .control { border-color: color-mix(in oklch, var(--accent) 35%, var(--line-strong)); }
+.field-hint code { font-size: var(--fs-xs); }
+.urlbar .token.is-bound7 { font-family: var(--mono); }
+.status.is-bad7 { color: var(--danger); }
+.ref7 { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--accent-text); font-size: var(--fs-sm); white-space: nowrap; }
+.ref7.is-in { color: var(--text-2); }
+.ref7 code { font-size: var(--fs-xs); background: none; padding: 0; color: inherit; }
+
+/* ---------- Right column ---------- */
+.j7-rh-t { font-size: var(--fs-base); font-weight: 600; white-space: nowrap; }
+.jm .status-code.danger { color: var(--danger); display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 600; }
+.j7-intro h3 { margin: 0 0 0.25rem; font-size: var(--fs-base); font-weight: 600; }
+.j7-intro p { margin: 0; color: var(--text-2); font-size: var(--fs-md); line-height: 1.5; }
+.crit7 { display: flex; align-items: center; gap: 0.625rem; flex-wrap: wrap; padding: 0.5rem 0.75rem; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); font-size: var(--fs-sm); }
+.crit7-l { color: var(--text-3); }
+.crit7 code { font-size: var(--fs-sm); }
+.crit7-src { margin-inline-start: auto; color: var(--text-3); font-size: var(--fs-xs); }
+.jm .result-body { display: grid; gap: 0.875rem; align-content: start; }
+.ex7-g .sg-head { border-block-end: 0; padding-block-end: 0; }
+.ex7-list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); overflow: hidden; }
+.ex7 { padding: 0.625rem 0.875rem; display: grid; gap: 0.375rem; }
+.ex7 + .ex7 { border-block-start: 1px solid var(--line); }
+.ex7-head { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; row-gap: 0.25rem; }
+.ex7-t { font: 500 var(--fs-md)/1.3 var(--mono); }
+.ex7-key { font-size: var(--fs-sm); color: var(--text-3); display: inline-flex; align-items: center; gap: 0.375rem; flex-wrap: wrap; }
+.ex7-key code { font-size: var(--fs-xs); }
+.ex7-f { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.1875rem 1rem; align-items: baseline; font-size: var(--fs-sm); padding-inline-start: 0.125rem; }
+.ex7-f div { display: contents; }
+.ex7-f dt { font-family: var(--mono); font-size: var(--fs-xs); color: var(--text-3); }
+.ex7-f dd { margin: 0; color: var(--text-2); }
+.j7-foot { margin-block-start: 0.25rem; }
+
+/* The verdict and the tally that filters the findings. */
+/* The verdict: a tinted icon tile carries the colour; the words stay in text colours, so the
+   pane reads calmly even when a step fails. */
+.vd7 { display: flex; gap: 0.75rem; align-items: flex-start; padding-block: 0.125rem 0.25rem; }
+.vd7-ico { flex: none; display: grid; place-items: center; inline-size: 2.25rem; block-size: 2.25rem; border-radius: var(--r-lg); color: var(--danger); background: var(--danger-soft); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--danger) 18%, transparent); }
+.vd7-text { display: grid; gap: 0.125rem; min-inline-size: 0; padding-block-start: 0.0625rem; }
+.vd7-text h3 { margin: 0; font-size: var(--fs-lg); font-weight: 600; color: var(--text); letter-spacing: -0.011em; line-height: 1.35; }
+.vd7-text p { margin: 0; color: var(--text-2); font-size: var(--fs-md); line-height: 1.5; }
+.vd7:is(.is-pass, .is-ok2) .vd7-ico { color: var(--ok); background: var(--ok-soft); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ok) 18%, transparent); }
+.vd7.is-ad .vd7-ico { color: var(--info); background: var(--info-soft); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--info) 18%, transparent); }
+.vd7.is-warn .vd7-ico { color: var(--warn); background: var(--warn-soft); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--warn) 22%, transparent); }
+/* The filter is the app's own segmented control; a coloured dot says what each count means. */
+.tl7 { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.op-badge:not([class*="op-"]) { background: var(--sunken); color: var(--text-2); box-shadow: inset 0 0 0 1px var(--line); }
+.tl7 .segmented button { gap: 0.375rem; }
+.tl7-n { font-size: var(--fs-xs); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.tl7-dot { inline-size: 0.4375rem; block-size: 0.4375rem; border-radius: 50%; flex: none; }
+.tl7-dot.is-bad { background: var(--danger); }
+.tl7-dot.is-ad { background: var(--info); }
+.tl7-dot.is-ok { background: var(--ok); }
+.tl7-src { font-size: var(--fs-xs); color: var(--text-3); white-space: nowrap; }
+.j7-cmp .j7-sl, .j7-ads .j7-sl, .j7-last .j7-sl, .j7-stop .j7-sl { margin: 0.5rem 0 -0.25rem; }
+
+/* Finding tags: one shape, one colour per meaning, always with a word. */
+.fd7 { display: inline-flex; align-items: center; gap: 0.25rem; block-size: 1.375rem; padding-inline: 0.4375rem; border-radius: var(--r-sm); font-size: var(--fs-xs); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.fd7.is-ok { color: var(--ok); background: var(--ok-soft); }
+.fd7.is-bad { color: var(--danger); background: var(--danger-soft); }
+.fd7.is-ad { color: var(--info); background: var(--info-soft); }
+.fd7.is-muted { color: var(--text-3); background: var(--sunken); }
+.adc7 { display: inline-flex; align-items: center; gap: 0.25rem; block-size: 1.375rem; padding-inline: 0.4375rem; border-radius: var(--r-sm); background: var(--info-soft); color: var(--info); font: 600 var(--fs-xs)/1 var(--mono); text-decoration: none; white-space: nowrap; }
+.adc7:hover { text-decoration: underline; }
+
+/* A comparison card: the expected write against what was written, field by field. */
+.cf7 { border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); overflow: hidden; }
+.cf7 { position: relative; box-shadow: var(--shadow-sm); }
+/* The finding sits at the end of the head, one column for the eye to scan down; only the field
+   that differs is tinted, so the colour points at the problem rather than the whole card. */
+.cf7-head { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; row-gap: 0.25rem; min-block-size: 2.75rem; padding: 0.375rem 0.75rem 0.375rem 0.875rem; border-block-end: 1px solid var(--line); }
+[dir="rtl"] .cf7-head { padding: 0.375rem 0.875rem 0.375rem 0.75rem; }
+.cf7-head .tc-key { margin-inline-start: 0.125rem; }
+.cf7-t { font: 500 var(--fs-md)/1.3 var(--mono); }
+.cf7-head .tc-key { font-size: var(--fs-sm); }
+.cf7-head .tc-key .k { font-family: var(--mono); font-size: var(--fs-xs); }
+.cf7-grid { display: grid; grid-template-columns: 1.75rem minmax(7.5rem, 0.9fr) minmax(0, 1.3fr) minmax(0, 1fr); font-size: var(--fs-md); }
+.cf7-row { display: contents; }
+.cf7-row > * { padding: 0.5rem 0.625rem; border-block-start: 1px solid var(--line); min-inline-size: 0; display: flex; align-items: center; gap: 0.375rem; flex-wrap: wrap; }
+.cf7-row > .cf7-mk { padding-inline: 0 0; justify-content: center; }
+.cf7-row.is-th > * { border-block-start: 0; padding-block: 0.375rem; font-size: var(--fs-xs); font-weight: 500; color: var(--text-3); background: var(--panel); }
+.cf7-row .k { font-size: var(--fs-sm); color: var(--text-2); background: none; padding-inline: 0.625rem; border-radius: 0; }
+.cf7-row.is-ok .cf7-mk { color: var(--ok); }
+.cf7-row.is-bad > * { background: color-mix(in oklch, var(--danger-soft) 70%, transparent); }
+.cf7-row.is-bad .cf7-mk, .cf7-row.is-bad .a .j7-v { color: var(--danger); }
+.cf7-row.is-bad .a .j7-v { font-weight: 600; }
+.cf7-row.is-ad > * { background: color-mix(in oklch, var(--info-soft) 60%, transparent); }
+.cf7-row.is-ad .cf7-mk { color: var(--info); }
+.cf7-note { display: inline-flex; }
+.j7-v { font-family: var(--mono); font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.src7 { flex-basis: 100%; display: flex; }
+.src7 .ref7 { font-size: var(--fs-xs); }
+.cf7-miss { display: grid; grid-template-columns: 1fr 1fr; }
+.cf7-miss > div { padding: 0.625rem 0.875rem; display: grid; gap: 0.25rem; align-content: start; }
+.cf7-miss > div + div { border-inline-start: 1px solid var(--line); }
+.cf7-miss > .is-none { background: color-mix(in oklch, var(--danger-soft) 70%, transparent); }
+.cf7-miss p { margin: 0; font-size: var(--fs-md); line-height: 1.55; color: var(--text-2); }
+.cf7-miss code { font-size: var(--fs-xs); }
+.cf7-lbl { font-size: var(--fs-xs); font-weight: 500; color: var(--text-3); }
+/* A narrow card (a phone, 130% text, a narrow pane) stacks each field: the name, then Expected
+   and Written on their own lines with their labels, so values never squeeze or scroll. */
+.cf7 { container-type: inline-size; }
+@container (max-width: 32rem) {
+  .cf7-grid { grid-template-columns: 1.75rem minmax(0, 1fr); }
+  .cf7-row.is-th { display: none; }
+  .cf7-row > .cf7-mk { grid-row: span 3; align-items: flex-start; padding-block-start: 0.625rem; }
+  .cf7-row > .k { padding-block-end: 0.125rem; }
+  .cf7-row > .e, .cf7-row > .a { border-block-start: 0; padding-block: 0.125rem; padding-inline: 0.625rem; flex-wrap: nowrap; align-items: baseline; }
+  .cf7-row > .a { padding-block-end: 0.625rem; }
+  .cf7-row > .e > :not(.src7), .cf7-row > .a > * { min-inline-size: 0; }
+  .cf7-row > .e { flex-wrap: wrap; }
+  .cf7-row > .e::before, .cf7-row > .a::before { font-size: var(--fs-xs); color: var(--text-3); inline-size: 4.5rem; flex: none; }
+  .cf7-row > .e::before { content: var(--j7-exp, "Expected"); }
+  .cf7-row > .a::before { content: var(--j7-wr, "Written"); }
+  .cf7-row .src7 { padding-inline-start: 4.875rem; }
+  .cf7-miss { grid-template-columns: minmax(0, 1fr); }
+  .cf7-miss > div + div { border-inline-start: 0; border-block-start: 1px solid var(--line); }
+}
+.src7 .ref7 { white-space: normal; overflow-wrap: anywhere; }
+/* The result tabs scroll if they ever don't fit (130% text, a narrow pane); the fade says so. */
+.j7-rtabs { overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent); }
+[dir="rtl"] .j7-rtabs { mask-image: linear-gradient(to left, #000 calc(100% - 2.5rem), transparent); }
+.cf7-foot { display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 0.5rem 0.875rem; border-block-start: 1px solid var(--line); background: var(--panel); }
+
+.cf7.is-approved { border-color: color-mix(in oklch, var(--info) 30%, var(--line)); }
+.cf7.is-approved .cf7-miss > .is-none { background: color-mix(in oklch, var(--info-soft) 60%, transparent); }
+.cf7.is-unchecked { border-style: dashed; border-color: var(--line-strong); background: var(--panel); }
+.cf7-cover { margin: 0; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; padding: 0.5rem 0.875rem; border-block-start: 1px solid var(--line); font-size: var(--fs-sm); color: var(--text-2); }
+.cf7-cover > .i { color: var(--info); }
+.cf7-skip { padding: 0.625rem 0.875rem; display: grid; gap: 0.25rem; }
+.cf7-skip p { margin: 0; font-size: var(--fs-md); line-height: 1.55; color: var(--text-2); }
+.cf7-skip strong { color: var(--text); font-weight: 500; }
+.cf7-skip code { font-size: var(--fs-xs); }
+.ad7.is-expired { border-color: color-mix(in oklch, var(--warn) 35%, var(--line)); }
+.ad7.is-expired .adc7 { background: var(--sunken); color: var(--text-3); text-decoration: line-through; }
+.ad7-meta .is-exp { color: var(--warn); font-weight: 500; display: inline-flex; align-items: center; gap: 0.25rem; }
+
+/* An approved-difference record, as committed in store.expect.json. */
+.ad7 { border: 1px solid color-mix(in oklch, var(--info) 28%, var(--line)); border-radius: var(--r-lg); background: var(--raised); padding: 0.75rem 0.875rem; display: grid; gap: 0.375rem; scroll-margin-block-start: 1rem; }
+.ad7.is-unused { border-style: dashed; border-color: var(--line-strong); }
+.ad7.is-unused .adc7 { background: var(--sunken); color: var(--text-2); }
+.ad7-head { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; row-gap: 0.25rem; }
+.ad7-what { margin: 0; color: var(--text-2); }
+.ad7-what code { font-size: var(--fs-xs); }
+.ad7-step { font-size: var(--fs-xs); color: var(--text-3); }
+.ad7-reason { margin: 0; font-size: var(--fs-md); line-height: 1.5; color: var(--text); }
+.ad7-meta { margin: 0; font-size: var(--fs-xs); color: var(--text-3); display: flex; flex-wrap: wrap; gap: 0.125rem 0.375rem; }
+.ad7-meta a { color: var(--accent-text); }
+.ad7-meta .is-soon { color: var(--warn); font-weight: 500; }
+.ad7-unused { margin: 0.125rem 0 0; display: flex; gap: 0.375rem; align-items: flex-start; font-size: var(--fs-sm); color: var(--text-2); }
+.ad7-unused .i { margin-block-start: 0.1875rem; color: var(--text-3); flex: none; }
+.ad7-unused code { font-size: var(--fs-xs); }
+
+/* Matched writes: one quiet line each. */
+.mt7 { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); overflow: hidden; }
+.mt7 li { display: flex; align-items: center; gap: 0.5rem; min-block-size: 2.375rem; padding: 0.375rem 0.875rem; font-size: var(--fs-sm); }
+.mt7 li + li { border-block-start: 1px solid var(--line); }
+.mt7-ok { display: flex; color: var(--ok); }
+.mt7-t { font: 500 var(--fs-sm)/1.3 var(--mono); }
+/* A row that pairs a name with detail puts the detail under the name, left-aligned with it, in the
+   secondary colour on one line: it ellipsizes (its title keeps the whole text) and never wraps. */
+.row-sub { display: block; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-3); font-size: var(--fs-sm); line-height: 1.4; }
+.row-sub .j7-v { overflow-wrap: normal; }
+.mt7-main { display: flex; flex-direction: column; gap: 0.0625rem; flex: 1 1 auto; min-inline-size: 0; }
+.mt7-l1 { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; row-gap: 0.125rem; min-inline-size: 0; }
+.mt7-s { font-size: var(--fs-xs); color: var(--text-3); min-inline-size: 3rem; text-align: end; }
+.mt7 .is-crit code { font-size: var(--fs-xs); }
+
+/* The overview's right column: the last run and earlier runs. */
+.j7-meta { margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: var(--fs-sm); color: var(--text-3); }
+.lr7-list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); overflow: hidden; }
+.lr7-row { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr) auto 3.5rem; gap: 0.625rem; align-items: center; min-block-size: 2.5rem; padding: 0.375rem 0.875rem; font-size: var(--fs-md); }
+.lr7-row + .lr7-row { border-block-start: 1px solid var(--line); }
+.lr7-row.is-fail { background: color-mix(in oklch, var(--danger-soft) 60%, transparent); }
+.lr7-n { inline-size: 1.5rem; block-size: 1.5rem; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-strong); font: 600 var(--fs-xs)/1 var(--mono); color: var(--text-2); }
+.lr7-op { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lr7-t { text-align: end; font: 400 var(--fs-sm)/1 var(--mono); color: var(--text-3); }
+.j7-probs { border: 1px solid color-mix(in oklch, var(--danger) 25%, var(--line)); border-radius: var(--r-lg); padding: 0.75rem 0.875rem; background: var(--raised); }
+.j7-probs h3 { margin: 0 0 0.5rem; font-size: var(--fs-md); font-weight: 600; }
+.j7-probs ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.j7-probs li { display: flex; gap: 0.625rem; align-items: flex-start; font-size: var(--fs-md); color: var(--text-2); }
+.j7-probs .sm8-main { padding-block-start: 0.0625rem; }
+.j7-probs li .fd7 { flex: none; }
+.j7-probs code { font-size: var(--fs-xs); }
+.hr7 { list-style: none; margin: 0; padding: 0; display: grid; }
+.hr7 li { display: grid; grid-template-columns: 1.25rem minmax(0, 1fr) auto; gap: 0.625rem; align-items: start; padding: 0.625rem 0; border-block-end: 1px solid var(--line); }
+.hr7-ico { display: flex; margin-block-start: 0.125rem; }
+.hr7-ico.is-ok { color: var(--ok); }
+.hr7-ico.is-danger { color: var(--danger); }
+.hr7-ico.is-muted { color: var(--text-3); }
+/* A run the person ended early is neither a pass nor a failure: a quiet stop mark. */
+.j7-rh .status-code.muted { color: var(--text-3); }
+.sm8-h.is-ended > .i { color: var(--text-3); }
+.hr7-l { display: grid; gap: 0.125rem; min-inline-size: 0; }
+.hr7-a { font-size: var(--fs-md); font-weight: 500; }
+.hr7-b { font-size: var(--fs-sm); color: var(--text-3); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hr7-b .i { vertical-align: -0.15em; margin-inline: 0.125rem 0.25rem; }
+.hr7-t { font: 400 var(--fs-sm)/1.4 var(--mono); color: var(--text-3); }
+
+/* ---------- Run summary ---------- */
+/* A document, not a dashboard: the verdict in one line, the run's facts in one strip, then the
+   steps as one list. Every row is a single line; nothing in it wraps. */
+.sm8-head { padding-block-end: 0.25rem; }
+.sm8-h { display: flex; align-items: center; gap: 0.5rem; }
+.sm8-h > .i { inline-size: 1.25rem; block-size: 1.25rem; flex: none; color: var(--danger); stroke-width: 2.1; }
+.sm8-head .op-desc { margin-block-start: 0.25rem; }
+/* The run's facts as one byline under the verdict, the way an issue or a pull request reads:
+   who ran it and how, when, how long, what happened to its writes. Items wrap whole, never inside. */
+.by8 { margin: 0.75rem 0 0; overflow: hidden; font-size: var(--fs-md); color: var(--text-2); }
+/* Every item leads with a dot; the row is pulled back by one dot's width and clipped, so the
+   dot that starts a line (the first, or one after a wrap on a phone) is never seen. */
+.by8-in { display: flex; flex-wrap: wrap; align-items: center; row-gap: 0.375rem; margin-inline-start: -1.1875rem; }
+.by8-i { display: inline-flex; align-items: center; gap: 0.375rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.by8-i::before { content: ""; flex: none; inline-size: 0.1875rem; block-size: 0.1875rem; border-radius: 50%; background: var(--text-3); opacity: 0.7; margin-inline: 0.5rem 0.125rem; }
+.by8-i > .i { color: var(--text-3); }
+.by8 strong { font-weight: 500; color: var(--text); }
+/* The run's time is what people come back for, so it's the one item set apart: a quiet chip in
+   the text colour, mono figures. */
+.by8-dur { display: inline-flex; align-items: center; gap: 0.3125rem; block-size: 1.5rem; padding-inline: 0.4375rem 0.5rem; border-radius: var(--r-sm); background: var(--raised); box-shadow: inset 0 0 0 1px var(--line-strong), var(--shadow-sm); font: 600 var(--fs-md)/1 var(--mono); color: var(--text); font-variant-numeric: tabular-nums; }
+.by8-dur .i { color: var(--accent-text); }
+.by8-mode { display: inline-flex; align-items: center; gap: 0.25rem; }
+.by8-mode .i { color: var(--accent-text); }
+.av8 { inline-size: 1.125rem; block-size: 1.125rem; border-radius: 50%; display: grid; place-items: center; flex: none; background: oklch(0.88 0.06 30); color: oklch(0.35 0.1 30); font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.02em; }
+.by8 .av8 { margin-inline-end: 0.125rem; }
+.sm8-body .j7-sl:first-child { margin-block-start: 1.25rem; }
+
+/* Steps: number, endpoint, findings, a waterfall of the run's time, the time, a chevron. */
+.sm8 { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); overflow: hidden; box-shadow: var(--shadow-sm); }
+.sm8 > li + li { border-block-start: 1px solid var(--line); }
+.sm8 > li.is-fail { background: color-mix(in oklch, var(--danger-soft) 55%, var(--raised)); }
+.sm8-row { display: grid; grid-template-columns: 1.5rem minmax(0, 1fr) auto 5rem 3.25rem 1rem; align-items: center; column-gap: 0.75rem; min-block-size: 2.875rem; padding: 0.375rem 0.75rem 0.375rem 0.875rem; color: var(--text); text-decoration: none; transition: background 120ms var(--ease); }
+[dir="rtl"] .sm8-row { padding: 0.375rem 0.875rem 0.375rem 0.75rem; }
+.sm8-row:hover { background: var(--hover); }
+.sm8 > li.is-fail .sm8-row:hover { background: color-mix(in oklch, var(--danger-soft) 80%, var(--raised)); }
+.sm8-node { inline-size: 1.5rem; block-size: 1.5rem; border-radius: 50%; display: grid; place-items: center; font: 600 var(--fs-xs)/1 var(--mono); font-variant-numeric: tabular-nums; color: var(--ok); background: var(--ok-soft); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ok) 30%, transparent); }
+.sm8-row.is-fail .sm8-node { color: var(--danger); background: var(--raised); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--danger) 55%, transparent); }
+.sm8-op { display: flex; align-items: center; gap: 0.625rem; min-inline-size: 0; }
+.sm8-op .method { flex: none; }
+.sm8-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sm8-chips { display: flex; gap: 0.25rem; justify-content: flex-end; }
+.sm8-wf { position: relative; block-size: 0.375rem; border-radius: 999px; background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); }
+.sm8-wf > span { position: absolute; inset-block: 0; min-inline-size: 0.25rem; border-radius: 999px; background: color-mix(in oklch, var(--text-3) 75%, transparent); }
+.sm8-row.is-fail .sm8-wf > span { background: var(--danger); }
+.sm8-t { text-align: end; font: 400 var(--fs-sm)/1 var(--mono); color: var(--text-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sm8-chev { color: var(--text-3); }
+/* The failed step, open in place: each finding on one line, then the way to the step. */
+.sm8-detail { display: grid; gap: 0.75rem; justify-items: start; padding: 0.125rem 0.875rem 0.875rem calc(0.875rem + 1.5rem + 0.75rem); }
+[dir="rtl"] .sm8-detail { padding: 0.125rem calc(0.875rem + 1.5rem + 0.75rem) 0.875rem 0.875rem; }
+.sm8-detail ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.5rem 0.75rem; align-items: start; inline-size: 100%; }
+.sm8-detail li { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; align-items: start; }
+.sm8-detail li > .fd7 { justify-self: start; }
+.sm8-detail .sm8-main { gap: 0.125rem; }
+.sm8-detail code { font-size: var(--fs-sm); color: var(--text); background: none; padding: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-inline-size: 0; }
+/* A value that doesn't fit sits under its name and is cut with an ellipsis; its title holds the whole text. */
+.sm8-dv { color: var(--text-2); }
+.sm8-dv .j7-v { overflow-wrap: normal; }
+.sm8-arr { color: var(--text-3); margin-inline: 0.375rem; }
+.sm8-by { margin-inline-start: 0.25rem; font: 500 var(--fs-xs)/1 var(--mono); color: var(--info); }
+.sm8-open { background: var(--raised); text-decoration: none; color: var(--text); }
+.sm8-note { margin: 0.625rem 0 0; display: flex; align-items: center; gap: 0.5rem; font-size: var(--fs-sm); color: var(--text-3); }
+
+/* Quiet one-line lists: the stores rolled back, and the outputs with a copy button each. */
+.sm8-list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--raised); overflow: hidden; }
+.sm8-list li { display: flex; align-items: center; gap: 0.625rem; min-block-size: 2.625rem; padding: 0.25rem 0.875rem; font-size: var(--fs-md); white-space: nowrap; }
+.sm8-list li + li { border-block-start: 1px solid var(--line); }
+/* The undo a stopped Send run keeps: the same row the stop dialog offered. */
+.sm8-undo { display: flex; align-items: center; justify-content: flex-start; gap: 0.625rem; inline-size: 100%; block-size: auto; margin-block-start: 0.5rem; padding: 0.5rem 0.875rem; text-align: start; white-space: normal; }
+.sm8-undo-t { display: grid; gap: 0.0625rem; flex: 1 1 auto; min-inline-size: 0; }
+.sm8-undo-t .row-sub { color: var(--text-3); font-weight: 400; }
+.sm8-main { display: flex; flex-direction: column; gap: 0.0625rem; flex: 1 1 auto; min-inline-size: 0; }
+.sm8-ln { font-weight: 500; display: inline-flex; align-items: center; gap: 0.375rem; }
+.sm8-ln code { font-size: var(--fs-sm); font-weight: 400; color: var(--text-2); }
+.sm8-tag { margin-inline-start: auto; display: inline-flex; align-items: center; gap: 0.3rem; block-size: 1.375rem; padding-inline: 0.5rem; border-radius: var(--r-sm); background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); font-size: var(--fs-xs); font-weight: 500; color: var(--text-2); flex: none; }
+.sm8-outs li { padding-inline-end: 0.375rem; }
+.sm8-ok { flex: none; inline-size: 8.5rem; font-size: var(--fs-sm); color: var(--text-3); background: none; padding: 0; }
+.sm8-ov { flex: 1; min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; font-size: var(--fs-sm); color: var(--text); background: none; padding: 0; }
+.sm8-outs .copy { flex: none; opacity: 0; transition: opacity 120ms var(--ease); }
+.sm8-outs li:hover .copy, .sm8-outs .copy:focus-visible { opacity: 1; }
+@media (hover: none) { .sm8-outs .copy { opacity: 1; } }
+.j7-cli { margin-block-start: 0.25rem; }
+.j7-mcp { margin: 0; display: flex; gap: 0.5rem; align-items: flex-start; font-size: var(--fs-sm); color: var(--text-2); line-height: 1.6; }
+.j7-mcp .i { margin-block-start: 0.2rem; flex: none; color: var(--text-3); }
+.j7-mcp code { font-size: var(--fs-xs); }
+
+/* ---------- Stopped by a refusal ---------- */
+.stop7 { display: grid; gap: 0.875rem; padding: 1rem; border-radius: var(--r-lg); background: var(--raised); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+.stop7 .vd7-ico { inline-size: 2.25rem; block-size: 2.25rem; border-radius: var(--r-lg); background: var(--danger-soft); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--danger) 18%, transparent); color: var(--danger); }
+.stop7-top { display: flex; gap: 0.875rem; align-items: flex-start; }
+.stop7-top > div { display: grid; gap: 0.3125rem; min-inline-size: 0; }
+.stop7 .blk-eyebrow { color: var(--danger); }
+.stop7 h3 { margin: 0; font-size: var(--fs-lg); font-weight: 600; letter-spacing: -0.008em; line-height: 1.35; }
+.stop7-top p:not(.blk-eyebrow) { margin: 0; color: var(--text); font-size: var(--fs-md); line-height: 1.55; }
+.stop7 code { font-size: var(--fs-xs); }
+.stop7 q { font-style: normal; }
+.stop7-facts { list-style: none; margin: 0; padding: 0.75rem 0 0; display: grid; gap: 0.375rem; border-block-start: 1px solid var(--line); }
+.stop7-facts li { display: flex; gap: 0.5rem; align-items: flex-start; font-size: var(--fs-md); color: var(--text-2); }
+.stop7-facts li .i { flex: none; margin-block-start: 0.1875rem; color: var(--text-3); }
+.stop7-facts li.is-ok .i { color: var(--ok); }
+.stop7-facts strong { color: var(--text); font-weight: 500; }
+.stop7-next { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+.stop7-next p { margin: 0; flex: 1 1 14rem; font-size: var(--fs-sm); color: var(--text-2); }
+.stop7-next .btn .method { margin-inline-end: 0.125rem; }
+.stop7-next .btn .faint { font-family: var(--mono); font-size: var(--fs-xs); }
+
+/* ---------- Empty ---------- */
+.j7-empty { max-inline-size: 40rem; padding: 1.5rem var(--pad) 2.5rem; }
+.j7-empty .state { padding: 1.5rem 0 0.5rem; max-inline-size: none; }
+.j7-empty .state h1 { font-size: var(--fs-xl); }
+.j7-empty .state p { line-height: 1.6; }
+.j7-empty .state code { font-size: var(--fs-sm); }
+.j7-cta { display: flex; align-items: center; gap: 0.75rem; margin-block-start: 1.25rem; font-size: var(--fs-md); color: var(--text-3); white-space: nowrap; }
+.j7-cta .btn { gap: 0.5rem; }
+.j7-how { list-style: none; margin: 1.25rem 0 0; padding: 0; display: grid; gap: 1rem; }
+.j7-how li { display: grid; grid-template-columns: 1.75rem minmax(0, 1fr); gap: 0.75rem; }
+.j7-how .n { inline-size: 1.75rem; block-size: 1.75rem; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-strong); background: var(--raised); font: 600 var(--fs-sm)/1 var(--mono); color: var(--text-2); }
+.j7-how strong { display: block; font-weight: 600; margin-block: 0.25rem 0.125rem; }
+.j7-how p { margin: 0 0 0.5rem; color: var(--text-2); font-size: var(--fs-md); }
+.j7-how .blk-code pre { font-size: var(--fs-xs); white-space: pre; overflow-x: auto; }
+.js7-node.sk { border: 0; }
+.j7-rtabs .tab { padding-inline: 0.5625rem; }
+.j7-empty-foot { margin: 1.5rem 0 0; display: flex; gap: 0.5rem; font-size: var(--fs-md); color: var(--text-3); }
+
+/* ---------- Mode switch (top bar) and the Journeys sidebar head ---------- */
+/* Specification or Journeys: the app's segmented control, at the top bar's control height. */
+.mode7-wrap { display: flex; align-items: center; padding-inline-start: 0.5rem; margin-inline-start: 0.25rem; border-inline-start: 1px solid var(--line); flex: none; }
+.mode7 { display: inline-flex; padding: 0.1875rem; gap: 0.125rem; border-radius: var(--r); background: var(--sunken); box-shadow: inset 0 0 0 1px var(--line); }
+.mode7-i { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; block-size: calc(var(--btn-sm-h) - 0.375rem); padding-inline: 0.625rem; border-radius: 0.3rem; font-size: var(--fs-md); font-weight: 500; color: var(--text-2); text-decoration: none; white-space: nowrap; transition: color 120ms var(--ease), background 120ms var(--ease); }
+.mode7-i .i { color: var(--text-3); }
+.mode7-i:hover { color: var(--text); }
+.mode7-i[aria-current] { background: var(--raised); color: var(--text); box-shadow: var(--shadow-sm), 0 0 0 1px var(--line); }
+.mode7-i[aria-current] .i { color: var(--accent-text); }
+.mode7-drawer { padding: 0.75rem; border-block-end: 1px solid var(--line); flex: none; }
+.mode7-drawer .mode7 { display: flex; }
+.mode7-drawer .mode7-i { flex: 1; block-size: 2.5rem; font-size: var(--fs-base); }
+/* Below 1280 px the labels give way to icons (each keeps its title and name). */
+@media (max-width: 79.9375rem) and (min-width: 56.0625rem) {
+  .mode7-wrap .mode7-i { padding-inline: 0.5rem; }
+  .mode7-wrap .mode7-i span { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+/* The top bar's give-way steps (bar-fit.js), in order: mode switch icons, search icon, API version,
+   signed-in role, database name. Each keeps its title or accessible name. */
+.topbar.fit-mode .mode7-wrap .mode7-i { padding-inline: 0.5rem; }
+.topbar.fit-mode .mode7-wrap .mode7-i span { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.topbar.fit-search .search-trigger { inline-size: auto; flex: none; min-inline-size: 0; padding-inline: 0.7rem; }
+.topbar.fit-search .search-trigger .grow { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.topbar.fit-search .search-trigger .keys { display: none; }
+.topbar.fit-ver .api-switch .ver, .topbar.fit-role .persona .role, .topbar.fit-db .env .ltr { display: none; }
+/* The Journeys sidebar has no tabs; its head row keeps their height and names the source. */
+.jh7 { display: flex; align-items: center; gap: 0.5rem; min-block-size: var(--tab-h); padding-inline: 0.75rem 0.375rem; border-block-end: 1px solid var(--line); flex: none; }
+[dir="rtl"] .jh7 { padding-inline: 0.5rem 0.875rem; }
+.jh7-src { display: flex; align-items: center; gap: 0.4375rem; min-inline-size: 0; flex: 1; color: var(--text-3); font-size: var(--fs-sm); white-space: nowrap; }
+.jh7-src code { font-size: var(--fs-xs); color: var(--text); background: none; padding: 0; overflow: hidden; text-overflow: ellipsis; }
+.jh7-src.is-none { color: var(--text-3); }
+
+/* Run buttons: a journey's labels are longer than an operation's ("Preview step 4", "Run to
+   end") and carry a shortcut, so they size to their content and never shrink; the status
+   line beside them gives way first and stays on one line. */
+.actionbar.j7-actions .btn-run { inline-size: auto; flex: none; padding-inline: 0.875rem 0.5rem; gap: 0.5rem; }
+[dir="rtl"] .actionbar.j7-actions .btn-run { padding-inline: 0.5rem 0.875rem; }
+.actionbar.j7-actions .btn-run:not(:has(.kbd)) { padding-inline: 0.875rem; }
+.actionbar.j7-actions .btn-run .kbd { margin-inline-start: 0.125rem; }
+/* A status line never wraps and never cuts a word. It shows its whole sentence when the buttons
+   leave room; when they don't, the sentence (an unbreakable item) drops to a second flex line
+   that the one-line box clips, so only the icon shows. The sentence stays the tooltip and the
+   accessible name (title, and the text itself). */
+.actionbar.j7-actions .status { flex-wrap: wrap; align-content: flex-start; overflow: hidden; block-size: 1.875rem; column-gap: 0.5rem; row-gap: 0; }
+.actionbar.j7-actions .status { min-inline-size: var(--icon); }
+.actionbar.j7-actions .status > .i { flex: none; margin-block: calc((1.875rem - var(--icon)) / 2); }
+.actionbar.j7-actions .status > .spinner { flex: none; margin-block: calc((1.875rem - var(--icon-sm)) / 2); }
+/* Where even the icon will not fit beside the buttons, the buttons drop their shortcut hints (bar-fit.js). */
+.actionbar.j7-actions.is-tight .btn-run .kbd { display: none; }
+/* A journeys result bar's note works the same way: its sentence, or only its icon. */
+.pane-bar .bar-text.is-fit { flex-wrap: wrap; align-content: flex-start; overflow: hidden; block-size: 1.875rem; row-gap: 0; min-inline-size: var(--icon); }
+.pane-bar .bar-text.is-fit > .i { margin-block: calc((1.875rem - var(--icon)) / 2); }
+.pane-bar .bar-text.is-fit > span { flex: none; overflow: visible; text-overflow: clip; white-space: nowrap; line-height: 1.875rem; }
+.actionbar.j7-actions.is-tight .btn-run { padding-inline: 0.875rem; }
+.actionbar.j7-actions .status > span:not(.spinner) { display: block; flex: none; min-inline-size: 0; white-space: nowrap; line-height: 1.875rem; overflow: visible; -webkit-line-clamp: unset; }
+
+/* Run all, in the journeys sidebar's bar. */
+.j7-bar { justify-content: space-between; }
+.run7-btn { gap: 0.4375rem; padding-inline: 0.625rem 0.75rem; }
+.run7-btn .i { color: var(--accent-text); }
+.run7-btn:disabled .i { color: inherit; }
+a.jh7-src { text-decoration: none; }
+a.jh7-src:hover code { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--line-strong); }
+.jh7-src > span { color: var(--text-3); }
+a.j7-src-pill { text-decoration: none; }
+.j7-src-pill:hover { border-color: var(--line-strong); color: var(--text); }
+.j7-how .blk-code { margin-block-start: 0.5rem; }
+
+/* ---------- Phones: wrap, never scroll sideways ---------- */
+@media (max-width: 56rem) {
+  .sh7 { padding-inline: 1rem; }
+  /* A phone row: the step's name gets the whole first line; its method, findings and time
+     share the second, and if they don't fit, whole items move down, never squeeze. */
+  .sm8-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.375rem 0.5rem; padding-block: 0.625rem; }
+  .sm8-op { display: contents; }
+  .sm8-name { flex: 1 1 calc(100% - 3.5rem); min-inline-size: 0; }
+  .sm8-chev { order: 1; }
+  .sm8-op .method { order: 2; margin-inline-start: 2rem; }
+  .sm8-chips { order: 3; justify-content: flex-start; flex-wrap: wrap; }
+  .sm8-t { order: 4; margin-inline: auto 1.5rem; }
+  .sm8-wf { display: none; }
+  .sm8-detail { padding-inline: 0.875rem; }
+  .sm8-ok { inline-size: auto; flex: 0 1 auto; }
+  .sm8-outs li { flex-wrap: wrap; row-gap: 0; padding-block: 0.375rem; }
+  .sm8-outs .sm8-ok { flex-basis: calc(100% - 3rem); }
+  .sm8-outs .sm8-ov { order: 3; flex-basis: 100%; }
+  .sm8-list .sm8-lw { display: none; }
+  .actionbar.j7-actions .btn-run { flex: 1; padding-inline: 0.875rem; }
+  .sh7-top { flex-wrap: wrap; }
+  .sh7-note { flex-basis: 100%; }
+  .sh7-note > span:last-child { white-space: normal; }
+  .j7-body { padding-inline: 1rem; }
+  .js7-step { grid-template-columns: 1.5rem minmax(0, 1fr); }
+  .js7-l1 { flex-wrap: wrap; row-gap: 0.125rem; }
+  .js7-sum { margin-inline-start: 0; flex-basis: 100%; }
+  .js7-path { white-space: normal; overflow-wrap: anywhere; }
+  .lr7-row { grid-template-columns: 1.5rem minmax(0, 1fr) auto; }
+  .lr7-t { display: none; }
+  .mt7-s { margin-inline-start: auto; }
+  .tl7-src { flex-basis: 100%; }
+  .tl7 .spacer { display: none; }
+  .crit7-src { margin-inline-start: 0; flex-basis: 100%; }
+  .j7-stepnav .btn { inline-size: 2.75rem; block-size: 2.75rem; }
+  .resp-head > .j7-rerun { order: 3; inline-size: 2.75rem; block-size: 2.75rem; }
+  .jm .resp-head > .metric { order: 2; margin-inline-end: auto; }
+  .jm .resp-head > .copy { order: 3; margin-inline-start: 0; }
+  .jm .resp-head > .copy { inline-size: 2.75rem; block-size: 2.75rem; }
+  /* Four filters don't fit one row on a phone: a 2 × 2 grid, never a sideways scroll. */
+  .tl7 .segmented { display: grid; grid-template-columns: 1fr 1fr; inline-size: 100%; }
+  .tl7 .segmented button { block-size: 2.5rem; justify-content: flex-start; padding-inline: 0.75rem; }
+  .jm .view-switch button { padding-inline: 0.5rem; }
+}
+
+/* Journeys' reading panes hold the mocks' request-pane markup: their section labels are the quiet
+   kind, not the Docs page's h2 with its accent bar and rule. */
+.doc-pane h2.j7-sl { padding-block-end: 0; border-block-end: 0; font-size: inherit; font-weight: 500; color: var(--text-3); gap: 0.55rem; letter-spacing: 0; }
+.doc-pane h2.j7-sl::before { display: none; }
+.doc-pane .j7-sl:first-child { margin-block-start: 1rem; }
+@media (max-width: 56rem) { .sidebar .mode7-drawer.mobile-only { display: block; } }
+.mode7-drawer.mobile-only:not(:has(*)) { display: none; }
+.j7-banner-acts { margin-inline-start: auto; flex: none; display: flex; align-items: center; }
+.sh7 .j7-end { margin-inline-start: auto; color: var(--text-3); }
+.sh7 .j7-end:hover { color: var(--text); }
+.hr7-link { display: contents; color: inherit; text-decoration: none; }
+.hr7 li:has(.hr7-link:hover) .hr7-a { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--line-strong); }
+.j7-inputs-list { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.5rem 1rem; font-size: var(--fs-md); }
+.j7-inputs-list div { display: contents; }
+.j7-inputs-list dt { font-family: var(--mono); font-size: var(--fs-sm); color: var(--text-3); }
+.j7-inputs-list dd { margin: 0; min-inline-size: 0; overflow-wrap: anywhere; }
+.j7-inputs-list code { font-size: var(--fs-sm); background: none; padding: 0; }
+.r7-sub .spinner { inline-size: 0.625rem; block-size: 0.625rem; margin-inline-end: 0.3rem; vertical-align: -0.0625rem; }
+/* Skeleton nodes keep the real nodes' shape but the skeleton's shimmer, not the node's own fill. */
+.js7-node.sk, .lr7-n.sk { background: linear-gradient(90deg, var(--line) 25%, var(--sunken) 50%, var(--line) 75%); background-size: 200% 100%; border: 0; box-shadow: none; }
+.sm8-h.is-pass > .i { color: var(--ok); }
+/* Phones: a journey's overview and summary show one pane at a time behind the pane switch, with
+   the run buttons pinned under the journey like Try it's (mocks m33, m37, m39). */
+@media (max-width: 56rem) {
+  .workspace.docs-mode.j7-reading[data-view="request"] > .aside-pane, .workspace.docs-mode.j7-reading[data-view="result"] > .doc-pane { display: none; }
+  .workspace.docs-mode.j7-reading > .doc-pane > .actionbar { position: sticky; inset-block-end: 0; z-index: 5; }
+  .workspace.docs-mode.j7-reading > .aside-pane { border-block-start: 0; }
+}
+@media (max-width: 56rem) { .sm8-outs .sm8-ok { flex-basis: calc(100% - 4rem); } }
+/* A compact value (an ID, a date-time) breaks only when it can't fit a line of its own. */
+.cf7-row .j7-v { overflow-wrap: break-word; }

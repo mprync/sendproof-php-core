@@ -3,6 +3,7 @@
 // Placeholders in braces are filled by i18n.t (text) or i18n.th (trusted HTML values).
 import capture from './en-capture.js';
 import stores from './en-stores.js';
+import journeys from './en-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -12,6 +13,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'then',
     'unit.bytes': '{n} B',

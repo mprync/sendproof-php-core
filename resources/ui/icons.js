@@ -80,6 +80,24 @@
     // v6: data stores (Preview unavailable and the write guard).
     'flask-off': '<path d="M9 3h6"/><path d="M10 3v4.5M14 3v6l2.2 4.1"/><path d="M8.6 11.4 4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 .9-.25"/><path d="M3 3l18 18"/>',
     ban: '<circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/>',
+    // v7: journeys (the mode switch, the progress rail, comparison findings and run summaries).
+    route: '<circle cx="6" cy="19" r="2.5"/><circle cx="18" cy="5" r="2.5"/><path d="M8.5 19H16a3.5 3.5 0 0 0 0-7H8a3.5 3.5 0 0 1 0-7h7.5"/>',
+    'circle-x': '<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>',
+    'circle-dashed': '<path d="M10.1 3.2a9 9 0 0 1 3.8 0M17.6 4.9a9 9 0 0 1 2.7 2.7M20.8 10.1a9 9 0 0 1 0 3.8M19.1 17.6a9 9 0 0 1-2.7 2.7M13.9 20.8a9 9 0 0 1-3.8 0M6.4 19.1a9 9 0 0 1-2.7-2.7M3.2 13.9a9 9 0 0 1 0-3.8M4.9 6.4a9 9 0 0 1 2.7-2.7"/>',
+    play: '<path d="M7.5 4.8v14.4L19 12z"/>',
+    forward: '<path d="M4 5.5v13l7.5-6.5zM12.5 5.5v13L20 12z"/>',
+    bind: '<path d="M5 4v7a4 4 0 0 0 4 4h10"/><path d="m15 11 4 4-4 4"/>',
+    'badge-check': '<path d="M12 2.8l2.3 1.7 2.8-.2.9 2.7 2.4 1.5-.9 2.7.9 2.7-2.4 1.5-.9 2.7-2.8-.2L12 21.2l-2.3-1.7-2.8.2-.9-2.7-2.4-1.5.9-2.7-.9-2.7 2.4-1.5.9-2.7 2.8.2z"/><path d="m9 12 2 2 4-4"/>',
+    download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+    bot: '<rect x="4.5" y="8" width="15" height="11" rx="3"/><path d="M12 4v4M9.5 13v1M14.5 13v1"/>',
+    'file-code': '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M10 12.5l-2 2 2 2M14 12.5l2 2-2 2"/>',
+    ne: '<path d="M5 9.5h14M5 14.5h14M15.5 5l-7 14"/>',
+    'minus-circle': '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+    'plus-circle': '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+    skip: '<circle cx="12" cy="12" r="9"/><path d="M9 8.5v7M10.5 12 15 8.5v7z"/>',
+    'shield-check': '<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/>',
+    // v8: the workbench's own dialogs (Stop run).
+    stop: '<rect x="6" y="6" width="12" height="12" rx="2"/>',
   };
   document.body.insertAdjacentHTML('afterbegin',
     '<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">' +

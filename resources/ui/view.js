@@ -3,6 +3,8 @@
 import { esc, icon, method, tab } from './components.js';
 import { t } from './i18n.js';
 import { shortcutAttrs, shortcutHint, shortcutLong, shortcutLabel } from './shortcuts.js';
+import { journeysEnabled } from './journeys-model.js';
+import { modeSwitch } from './journeys-view.js';
 
 export { esc, icon, method };
 
@@ -42,8 +44,9 @@ function topbar(cap, info) {
     <span class="crumb-sep desktop-only" aria-hidden="true">/</span>
     <span class="api-switch"><span class="name" lang="en" dir="auto">${esc(cap.apiName || info.title || 'API')}</span>${version}</span>
     ${cap.environment || database ? envChip(cap, database) : ''}
+    ${journeysEnabled(cap) ? `<span class="mode7-wrap desktop-only">${modeSwitch('spec')}</span>` : ''}
     <div class="spacer"></div>
-    <button type="button" class="search-trigger" data-action="palette" ${shortcutAttrs('palette')}>
+    <button type="button" class="search-trigger" data-action="palette" title="${esc(t('shell.search'))}" ${shortcutAttrs('palette')}>
       ${icon('search', true)}<span class="grow">${esc(t('shell.search'))}</span>${shortcutHint('palette')}
     </button>
     ${toolButton('display', 'sliders', t('shell.display'))}
@@ -53,8 +56,12 @@ function topbar(cap, info) {
   </header>`;
 }
 
-function sidebar() {
+function sidebar(cap) {
+  // With journeys, phones put the mode switch at the top of the drawer; Journeys mode swaps the
+  // tab row for a head row of the same height that names where the journeys come from.
+  const journeys = journeysEnabled(cap);
   return `<nav class="sidebar" id="operations" aria-label="${esc(t('side.operations'))}">
+    ${journeys ? `<div class="mode7-drawer mobile-only">${modeSwitch('spec', { drawer: true })}</div><div class="jh7" data-journeys-head hidden></div>` : ''}
     <div class="tabs" role="tablist" aria-label="${esc(t('side.browse'))}">
       ${tab(t('side.operations'), { selected: true, count: '–', id: 'side-tab-operations', controls: 'nav', shortcut: 'sidebar-operations', data: `data-side-tab="operations" title="${esc(t('side.operations'))}"` })}
       ${tab(t('side.models'), { count: '–', id: 'side-tab-models', controls: 'nav', shortcut: 'sidebar-models', data: `data-side-tab="models" title="${esc(t('side.models'))}"` })}
@@ -83,9 +90,10 @@ export function shell(capabilities, info = {}) {
       </div>
     </div>
     <div class="workspace" data-view="request">
-      ${sidebar()}
+      ${sidebar(capabilities)}
       <main class="pane request" id="request" aria-labelledby="op-title" tabindex="-1">
         <div id="context"></div>
+        ${journeysEnabled(capabilities) ? '<div id="journey-strip" hidden></div>' : ''}
         <div class="pane-scroll">
           <div id="operation"></div>
           <div class="tabs scrolls"><div class="request-tabs" role="tablist" aria-label="${esc(t('shell.request'))}"></div><div class="end request-tools"></div></div>

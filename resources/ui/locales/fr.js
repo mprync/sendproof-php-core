@@ -4,6 +4,7 @@
 // se connecter, aperçu, envoyer. Punctuation follows French typography (non-breaking space before : ; ? ! and inside « »).
 import capture from './fr-capture.js';
 import stores from './fr-stores.js';
+import journeys from './fr-journeys.js';
 
 const p = (one, other) => ({ one, many: other, other });
 
@@ -15,6 +16,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'puis',
     'unit.bytes': '{n} o',

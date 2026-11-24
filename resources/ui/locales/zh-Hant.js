@@ -3,6 +3,7 @@
 // operation 操作, model 模型, property 屬性, attribute 屬性, parameter 參數, header 標頭, roll back 還原.
 import capture from './zh-Hant-capture.js';
 import stores from './zh-Hant-stores.js';
+import journeys from './zh-Hant-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -12,6 +13,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': '然後',
     'unit.bytes': '{n} B',

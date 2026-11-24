@@ -1,6 +1,7 @@
 // German UI strings. Missing keys fall back to English (en.js).
 import capture from './de-capture.js';
 import stores from './de-stores.js';
+import journeys from './de-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -9,6 +10,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'dann',
     'unit.bytes': '{n} B',

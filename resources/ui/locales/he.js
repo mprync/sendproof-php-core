@@ -3,6 +3,7 @@
 // Actions are gender-neutral: buttons and menu items use nouns, instructions use the plural imperative.
 import capture from './he-capture.js';
 import stores from './he-stores.js';
+import journeys from './he-journeys.js';
 
 /** A plural entry from the three Hebrew forms, in the order one, two, other. */
 const p = (one, two, other) => ({ one, two, other });
@@ -15,6 +16,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'ואז',
     'unit.bytes': '{n} B',

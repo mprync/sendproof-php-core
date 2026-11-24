@@ -2,6 +2,7 @@
 // Terminologi: forespørsel, svar, felt, skjema, logg inn, forhåndsvisning, send, operasjon, modell, egenskap, attributt, parameter.
 import capture from './nb-capture.js';
 import stores from './nb-stores.js';
+import journeys from './nb-journeys.js';
 
 export default {
   dir: 'ltr',
@@ -11,6 +12,7 @@ export default {
   strings: {
     ...capture,
     ...stores,
+    ...journeys,
     'app.name': 'Sendproof',
     'kbd.then': 'deretter',
     'unit.bytes': '{n} B',
