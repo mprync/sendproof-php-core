@@ -1,6 +1,6 @@
 # sendproof/core
 
-Framework-neutral PHP core of [Sendproof protocol v1](https://github.com/mprync/sendproof/blob/6d116184ca5d46a98a86dc2be09861542f0d48bf/spec/README.md). A framework integration such as [`sendproof/laravel`](https://github.com/mprync/sendproof/blob/6d116184ca5d46a98a86dc2be09861542f0d48bf/adapters/php/laravel/README.md) supplies request dispatch and a database provider; this package supplies everything else.
+Framework-neutral PHP core of [Sendproof protocol v1](https://github.com/mprync/sendproof/blob/a95579be596e1038c78584d274904a645f72e35a/spec/README.md). A framework integration such as [`sendproof/laravel`](https://github.com/mprync/sendproof/blob/a95579be596e1038c78584d274904a645f72e35a/adapters/php/laravel/README.md) supplies request dispatch and a database provider; this package supplies everything else.
 
 | Area | Classes |
 | --- | --- |
@@ -16,7 +16,7 @@ Framework-neutral PHP core of [Sendproof protocol v1](https://github.com/mprync/
 The workbench UI is not copied into this repository's PHP sources. `resources/ui` is generated output of the shared packer and must be refreshed before a release:
 
 ```sh
-composer embed-ui   # node tools/pack-ui.mjs --version 0.1.0-alpha.2 --out resources/ui
+composer embed-ui   # node tools/pack-ui.mjs --version 0.1.0-alpha.3 --out resources/ui
 ```
 
 `UiBundle` serves only files listed in `manifest.json` and refuses any file whose hash does not match.
@@ -39,4 +39,4 @@ composer install && vendor/bin/phpunit
 
 ## Data stores
 
-`Sendproof\Core\Stores` holds the write guard, the classifiers and the hooks for Predis, the AWS SDK and the MongoDB library. `PreviewRunner::run()` takes the hooked stores as its last argument. See [data stores in the PHP binding](https://github.com/mprync/sendproof/blob/6d116184ca5d46a98a86dc2be09861542f0d48bf/adapters/php/data-stores.md).
+`Sendproof\Core\Stores` holds the write guard, the classifiers and the hooks for Predis, the AWS SDK and the MongoDB library. `PreviewRunner::run()` takes the hooked stores as its last argument. See [data stores in the PHP binding](https://github.com/mprync/sendproof/blob/a95579be596e1038c78584d274904a645f72e35a/adapters/php/data-stores.md).

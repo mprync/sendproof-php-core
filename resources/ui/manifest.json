@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0-alpha.2",
-  "bundleHash": "67c7f7d569ffe46aa389c1601f844cde16a22504e7e0d43e5a20c5378c419f1f",
+  "version": "0.1.0-alpha.3",
+  "bundleHash": "892ab3ecf1add6a1be59e7b8677313fdfb21799edece24374cb79fc3ba847d31",
   "files": {
     "action-bar.js": {
       "sha256": "602e4e63ef32722957a0e7706b9d7f681842efe1642fbe99c20744e72c164016",
@@ -278,8 +278,8 @@
       "contentType": "text/javascript; charset=utf-8"
     },
     "journeys/index.js": {
-      "sha256": "4589f1d0a00e8de3e558228cb948bb68d72d7fd0a5e221f5a2e566640e1630ea",
-      "bytes": 461,
+      "sha256": "4610971688fe354a8b4194d1245585fa35441a57038e9a52b2e4d0fb2e960246",
+      "bytes": 472,
       "contentType": "text/javascript; charset=utf-8"
     },
     "journeys/run.js": {
